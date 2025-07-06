@@ -1,14 +1,22 @@
 [gd_scene load_steps=9 format=3 uid="uid://ca7rvhkwva4jj"]
 
 [ext_resource type="Script" uid="uid://bapyf443teuy1" path="res://scripts/player.gd" id="1_onrkg"]
-[ext_resource type="Shader" uid="uid://c1ae5il32sg4y" path="res://scenes/player.gdshader" id="1_qhqgy"]
 [ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/cubes/player_73-uhd.png" id="2_i3pqv"]
 [ext_resource type="AudioStream" uid="uid://bp6yafhqyfej2" path="res://sounds/explode.ogg" id="2_tuyoq"]
 [ext_resource type="Script" uid="uid://ble1iywgxleei" path="res://scripts/interpolate.gd" id="3_qlg0r"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="4_dqkch"]
 
+[sub_resource type="Shader" id="Shader_qlg0r"]
+code = "shader_type canvas_item;
+uniform float intensity = 1.0;
+
+
+void fragment() {
+	COLOR *= vec4(1.0 * intensity, 1.0 / intensity, 1.0 / intensity,1);
+}"
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhqgy"]
-shader = ExtResource("1_qhqgy")
+shader = SubResource("Shader_qlg0r")
 shader_parameter/intensity = 1.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_krlm5"]
@@ -25,6 +33,14 @@ stream = ExtResource("2_tuyoq")
 [node name="Sprite" type="Node2D" parent="."]
 material = SubResource("ShaderMaterial_qhqgy")
 script = ExtResource("3_qlg0r")
+
+[node name="Camera2D" type="Camera2D" parent="Sprite"]
+offset = Vector2(304, -187)
+position_smoothing_enabled = true
+position_smoothing_speed = 15.0
+drag_vertical_enabled = true
+drag_top_margin = 0.8
+drag_bottom_margin = 0.8
 
 [node name="Secondary" type="Sprite2D" parent="Sprite"]
 use_parent_material = true
@@ -54,14 +70,6 @@ shape = SubResource("RectangleShape2D_krlm5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_krlm5")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-offset = Vector2(304, -187)
-position_smoothing_enabled = true
-position_smoothing_speed = 15.0
-drag_vertical_enabled = true
-drag_top_margin = 0.8
-drag_bottom_margin = 0.8
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

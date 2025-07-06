@@ -33,9 +33,9 @@ func kill(time = 0.75, start_delay = 0.25):
 		$Sprite.rotation_degrees = 0
 		position = Vector2(48, -48)
 		velocity = Vector2.ZERO
-		$Camera2D.position_smoothing_enabled = false
+		$Sprite/Camera2D.position_smoothing_enabled = false
 		await get_tree().create_timer(0).timeout
-		$Camera2D.position_smoothing_enabled = true
+		$Sprite/Camera2D.position_smoothing_enabled = true
 		await get_tree().create_timer(start_delay).timeout
 		$CollisionShape2D.disabled = false
 		$/root/Level/Song.play()
