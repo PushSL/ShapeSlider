@@ -1,5 +1,5 @@
 extends CharacterBody2D
-const JUMP_VELOCITY = -1850
+const JUMP_VELOCITY = -1800
 var alive: bool = true
 
 
