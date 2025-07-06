@@ -11,7 +11,7 @@ func _physics_process(delta: float) -> void:
 			velocity.y = 5000
 		if is_on_wall():
 			kill()
-		position.x += 937 * delta
+		position.x += 975 * delta
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 			$Sprite.rotate(6.5 * delta)
