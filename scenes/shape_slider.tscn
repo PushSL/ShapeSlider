@@ -20,9 +20,8 @@ var current_level: int = 0
 var levels: int = 2
 var level_hard_best: Array = range(levels)
 var level_easy_best: Array = range(levels)
-var level_data = [\"res://levels/Mono Saneness.tscn\", 1]
+var level_data = [\"Mono Saneness\", 1]
 var data = ConfigFile.new()
-var err = data.load(\"user://data.cfg\")
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	load_data()
