@@ -1,9 +1,7 @@
 extends Node2D
 var ground_color: Color = Color8(0, 255, 102, 255)
-var a = false
-var b = 0
-var c = false
-var d = 0
+
+
 func _process(delta: float) -> void:
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700
 	$Ground/CollisionShape2D.position.x = $Player.position.x

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://kmxvuqn0i1vg"]
+[gd_scene load_steps=20 format=3 uid="uid://kmxvuqn0i1vg"]
 
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
@@ -6,8 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://gy0cxdrsgna3" path="res://textures/Reshade Logo.png" id="4_p0lug"]
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
 [ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/Mono Saneness Dark.tres" id="8_0s0e1"]
-[ext_resource type="PackedScene" uid="uid://dlq5heiw3swc8" path="res://scenes/level.tscn" id="10_yxe21"]
-[ext_resource type="PackedScene" uid="uid://ca7rvhkwva4jj" path="res://scenes/player.tscn" id="11_qmfet"]
 
 [sub_resource type="GDScript" id="GDScript_wakvg"]
 resource_name = "Menu"
@@ -30,17 +28,13 @@ func _ready() -> void:
 	$\"Color Menu\".visible = false
 	$\"Level Selector\".visible = false
 	$BG.visible = true
-	$\"../../Level\".visible = false
 	$\"Color Menu/Color Picker/Primary\".color = primary_color
 	$\"Color Menu/Color Picker/Secondary\".color = secondary_color
 	$\"Color Menu/Color Picker/Glow\".color = glow_color
 	$\"Color Menu/Preview/Primary\".modulate = primary_color
 	$\"Color Menu/Preview/Secondary\".modulate = secondary_color
 	$\"Color Menu/Preview/Glow\".modulate = glow_color
-	$\"../../Level/Player/Sprite/Primary\".modulate = primary_color
-	$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
-	$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
-	$\"../../Level/Player/Camera2D\".enabled = false
+
 
 func save_data(option: String = \"all\"):
 	if option == \"all\" or \"level_best\":
@@ -67,9 +61,7 @@ func _process(delta: float) -> void:
 	$\"../Debugger\".text = str(Engine.get_frames_per_second())
 	match scene:
 		\"color_selector\":
-			$\"../../Level/Player/Sprite/Primary\".modulate = primary_color
-			$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
-			$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
+			pass
 		\"level_selector\":
 			$\"Level Selector/Easy Mode Best\".value = level_easy_best[current_level]
 			$\"Level Selector/Hard Mode Best\".value = level_hard_best[current_level]
@@ -145,8 +137,16 @@ func _on_glow_color_changed(color: Color) -> void:
 
 func _on_start_pressed() -> void:
 	scene = \"gameplay\"
-	$\"../../Level/Player/Camera2D\".enabled = true
-	$\"../../Level\".visible = true
+	var level = load(\"res://scenes/level.tscn\").instantiate()
+	var player = preload(\"res://scenes/player.tscn\").instantiate()
+	$/root.add_child(level)
+	$/root/Level.add_child(player)
+	#$/root/Level.add_child(player)
+	#$root/Level/Player/Sprite/Primary.modulate = primary_color
+	#$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
+	#$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
+	#$\"../../Level/Player/Camera2D\".enabled = true
+	#$\"../../Level\".visible = true
 	$\"Main Menu\".queue_free()
 	$\"Icon Menu\".queue_free()
 	$\"Color Menu\".queue_free()
@@ -2276,12 +2276,6 @@ offset_top = 4.0
 offset_right = 44.0
 offset_bottom = 27.0
 theme = ExtResource("3_chx57")
-
-[node name="Level" parent="." instance=ExtResource("10_yxe21")]
-visible = false
-
-[node name="Player" parent="Level" instance=ExtResource("11_qmfet")]
-position = Vector2(48, -48)
 
 [connection signal="pressed" from="UI/Menu/Main Menu/Icons" to="UI/Menu" method="_on_icons_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Play" to="UI/Menu" method="_on_play_pressed"]

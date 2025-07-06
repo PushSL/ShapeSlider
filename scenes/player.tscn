@@ -15,6 +15,8 @@ size = Vector2(95, 95)
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_onrkg")
 
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+
 [node name="Sprite" type="Node2D" parent="."]
 material = SubResource("ShaderMaterial_qhqgy")
 
