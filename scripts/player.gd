@@ -1,7 +1,7 @@
 extends CharacterBody2D
 const JUMP_VELOCITY = -1850
 var alive: bool = true
-var gamemode: String = "ship"
+var gamemode: String = "cube"
 
 func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("reset"):
