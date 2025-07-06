@@ -1,9 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://kmxvuqn0i1vg"]
+[gd_scene load_steps=21 format=3 uid="uid://kmxvuqn0i1vg"]
 
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
 [ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/cubes/player_73-uhd.png" id="4_krlm5"]
 [ext_resource type="Texture2D" uid="uid://gy0cxdrsgna3" path="res://textures/Reshade Logo.png" id="4_p0lug"]
+[ext_resource type="AudioStream" uid="uid://k3rs6ci4ww7x" path="res://sounds/start_level.ogg" id="5_vymbj"]
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
 [ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/Mono Saneness Dark.tres" id="8_0s0e1"]
 
@@ -18,6 +19,7 @@ var current_level: int = 0
 var levels: int = 2
 var level_hard_best: Array = range(levels)
 var level_easy_best: Array = range(levels)
+var level_data: Array = [\"res://levels/Mono Saneness.tscn\", 1]
 var data = ConfigFile.new()
 var err = data.load(\"user://data.cfg\")
 # Called when the node enters the scene tree for the first time.
@@ -45,8 +47,8 @@ func save_data(option: String = \"all\"):
 			data.set_value(\"player_color\", \"primary\", primary_color)
 			data.set_value(\"player_color\", \"secondary\", secondary_color)
 			data.set_value(\"player_color\", \"glow\", glow_color)
-			print(data.get_value(\"player_color\", \"glow\"))
 	data.save(\"user://data.cfg\")
+
 func load_data(option: String = \"all\"):
 	if option == \"all\" or \"level_best\":
 		for level in levels:
@@ -69,6 +71,8 @@ func _process(delta: float) -> void:
 				current_level -= 1
 			if Input.is_action_just_pressed(\"right\") and current_level != levels - 1:
 				current_level += 1
+			if Input.is_action_just_pressed(\"jump\") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+				_on_start_pressed()
 			match current_level:
 				0:
 					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
@@ -136,22 +140,23 @@ func _on_glow_color_changed(color: Color) -> void:
 
 
 func _on_start_pressed() -> void:
-	scene = \"gameplay\"
-	var level = load(\"res://scenes/level.tscn\").instantiate()
-	var player = preload(\"res://scenes/player.tscn\").instantiate()
-	$/root.add_child(level)
-	$/root/Level.add_child(player)
-	#$/root/Level.add_child(player)
-	#$root/Level/Player/Sprite/Primary.modulate = primary_color
-	#$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
-	#$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
-	#$\"../../Level/Player/Camera2D\".enabled = true
-	#$\"../../Level\".visible = true
-	$\"Main Menu\".queue_free()
-	$\"Icon Menu\".queue_free()
-	$\"Color Menu\".queue_free()
-	$\"Level Selector\".queue_free()
-	$BG.queue_free()
+	if scene != \"gameplay\":
+		scene = \"gameplay\"
+		$\"Level Selector/AudioStreamPlayer2D\".stream = preload(\"res://sounds/start_level.ogg\")
+		$\"Level Selector/AudioStreamPlayer2D\".play()
+		await $\"Level Selector/AudioStreamPlayer2D\".finished
+		$\"Main Menu\".queue_free()
+		$\"Icon Menu\".queue_free()
+		$\"Color Menu\".queue_free()
+		var level = load(str(level_data[current_level])).instantiate()
+		$/root.add_child(level)
+		var player = preload(\"res://scenes/player.tscn\").instantiate()
+		$/root/Level.add_child(player)
+		$BG.queue_free()
+		$\"Level Selector\".queue_free()
+		$/root/Level/Player/Sprite/Secondary.modulate = secondary_color
+		$/root/Level/Player/Sprite/Glow.modulate = glow_color
+
 
 
 func _on_editor_pressed() -> void:
@@ -243,6 +248,18 @@ tracks/5/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_384sr"]
@@ -549,134 +566,6 @@ custom_minimum_size = Vector2(124, 124)
 layout_mode = 2
 focus_mode = 0
 text = "Editor"
-
-[node name="Level Selector" type="NinePatchRect" parent="UI/Menu"]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("8_0s0e1")
-
-[node name="Start" type="Button" parent="UI/Menu/Level Selector"]
-z_index = 1
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -256.5
-offset_top = -24.5
-offset_right = 256.5
-offset_bottom = 24.5
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 0
-theme_override_fonts/font = ExtResource("1_jqa43")
-theme_override_font_sizes/font_size = 64
-text = "Mono Saneness"
-flat = true
-
-[node name="TextureRect" type="TextureRect" parent="UI/Menu/Level Selector/Start"]
-z_index = -1
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -540.0
-offset_top = -195.0
-offset_right = 540.0
-offset_bottom = 195.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("8_0s0e1")
-
-[node name="Description" type="Label" parent="UI/Menu/Level Selector/Start"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -168.0
-offset_top = 34.0
-offset_right = 226.0
-offset_bottom = 50.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("3_chx57")
-theme_override_colors/font_color = Color(0.593134, 0.593134, 0.593134, 1)
-theme_override_font_sizes/font_size = 24
-text = "Difficulty: Ease/1.5 (1.5  )"
-
-[node name="Moon" type="TextureRect" parent="UI/Menu/Level Selector/Start/Description"]
-layout_mode = 0
-offset_left = 297.0
-offset_top = -6.0
-offset_right = 321.0
-offset_bottom = 18.0
-texture = ExtResource("7_m4023")
-expand_mode = 2
-
-[node name="Easy Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
-layout_mode = 0
-offset_left = 420.0
-offset_top = 830.0
-offset_right = 1500.0
-offset_bottom = 862.0
-theme = ExtResource("3_chx57")
-
-[node name="Label" type="Label" parent="UI/Menu/Level Selector/Easy Mode Best"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -30.0
-offset_right = 42.0
-offset_bottom = -19.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Easy Mode"
-
-[node name="Hard Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
-layout_mode = 0
-offset_left = 420.0
-offset_top = 883.0
-offset_right = 1500.0
-offset_bottom = 915.0
-theme = SubResource("Theme_qmfet")
-theme_override_fonts/font = ExtResource("1_jqa43")
-
-[node name="Label" type="Label" parent="UI/Menu/Level Selector/Hard Mode Best"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -30.0
-offset_right = 42.0
-offset_bottom = -19.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("3_chx57")
-text = "Hard Mode"
-
-[node name="Label" type="Label" parent="UI/Menu/Level Selector"]
-layout_mode = 0
-offset_left = 980.0
-offset_top = 253.0
-offset_right = 1020.0
-offset_bottom = 276.0
 
 [node name="Icon Menu" type="PanelContainer" parent="UI/Menu"]
 visible = false
@@ -2159,6 +2048,131 @@ texture = ExtResource("4_krlm5")
 region_enabled = true
 region_rect = Rect2(2, 132, 120, 120)
 
+[node name="Level Selector" type="NinePatchRect" parent="UI/Menu"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_0s0e1")
+
+[node name="Start" type="Button" parent="UI/Menu/Level Selector"]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("1_jqa43")
+theme_override_font_sizes/font_size = 64
+text = "Mono Saneness"
+flat = true
+
+[node name="TextureRect" type="TextureRect" parent="UI/Menu/Level Selector/Start"]
+z_index = -1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -540.0
+offset_top = -195.0
+offset_right = 540.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_0s0e1")
+
+[node name="Description" type="Label" parent="UI/Menu/Level Selector/Start"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -168.0
+offset_top = 34.0
+offset_right = 226.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+theme_override_colors/font_color = Color(0.593134, 0.593134, 0.593134, 1)
+theme_override_font_sizes/font_size = 24
+text = "Difficulty: Ease/1.5 (1.5  )"
+
+[node name="Moon" type="TextureRect" parent="UI/Menu/Level Selector/Start/Description"]
+layout_mode = 0
+offset_left = 297.0
+offset_top = -6.0
+offset_right = 321.0
+offset_bottom = 18.0
+texture = ExtResource("7_m4023")
+expand_mode = 2
+
+[node name="Easy Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 830.0
+offset_right = 1500.0
+offset_bottom = 862.0
+theme = ExtResource("3_chx57")
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector/Easy Mode Best"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.0
+offset_top = -30.0
+offset_right = 42.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Easy Mode"
+
+[node name="Hard Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 883.0
+offset_right = 1500.0
+offset_bottom = 915.0
+theme = SubResource("Theme_qmfet")
+theme_override_fonts/font = ExtResource("1_jqa43")
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector/Hard Mode Best"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.0
+offset_top = -30.0
+offset_right = 42.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+text = "Hard Mode"
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 980.0
+offset_top = 253.0
+offset_right = 1020.0
+offset_bottom = 276.0
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="UI/Menu/Level Selector"]
+stream = ExtResource("5_vymbj")
+
 [node name="Color Menu" type="PanelContainer" parent="UI/Menu"]
 visible = false
 z_index = 2
@@ -2280,8 +2294,8 @@ theme = ExtResource("3_chx57")
 [connection signal="pressed" from="UI/Menu/Main Menu/Icons" to="UI/Menu" method="_on_icons_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Play" to="UI/Menu" method="_on_play_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Editor" to="UI/Menu" method="_on_editor_pressed"]
-[connection signal="pressed" from="UI/Menu/Level Selector/Start" to="UI/Menu" method="_on_start_pressed"]
 [connection signal="pressed" from="UI/Menu/Icon Menu/Color Selector" to="UI/Menu" method="_on_color_selector_pressed"]
+[connection signal="pressed" from="UI/Menu/Level Selector/Start" to="UI/Menu" method="_on_start_pressed"]
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Primary" to="UI/Menu" method="_on_primary_color_changed"]
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Secondary" to="UI/Menu" method="_on_secondary_color_changed"]
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Glow" to="UI/Menu" method="_on_glow_color_changed"]
