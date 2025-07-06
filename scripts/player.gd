@@ -1,5 +1,5 @@
 extends CharacterBody2D
-const JUMP_VELOCITY = -1850
+const JUMP_VELOCITY = -1800
 var alive: bool = true
 
 
@@ -9,7 +9,7 @@ func _physics_process(delta: float) -> void:
 	if alive:
 		if velocity.y > 5000:
 			velocity.y = 5000
-		if is_on_wall() or is_on_ceiling():
+		if is_on_wall():
 			kill()
 		position.x += 937 * delta
 		if not is_on_floor():

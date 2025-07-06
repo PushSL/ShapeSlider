@@ -11,6 +11,7 @@
 [sub_resource type="GDScript" id="GDScript_wakvg"]
 resource_name = "Menu"
 script/source = "extends Control
+var fps: int = 0
 var scene: String = \"main_menu\"
 var primary_color: Color
 var secondary_color: Color
@@ -59,9 +60,8 @@ func load_data(option: String = \"all\"):
 			secondary_color = data.get_value(\"player_color\", \"secondary\", Color(0, 1, 1, 1 ))
 			glow_color = data.get_value(\"player_color\", \"glow\", Color(0, 1, 1, 1))
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	update_debugger()
-	
 	match scene:
 		\"color_selector\":
 			pass
@@ -87,14 +87,6 @@ func _process(delta: float) -> void:
 					$\"Level Selector/Start\".text = \"Front Off Track\"
 					$\"Level Selector\".texture = load(\"res://levels/Front Off Track.tres\")
 					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Front Off Track Dark.tres\")
-
-func update_debugger():
-	$\"../Debugger\".text = \"FPS: \" + str(Engine.get_frames_per_second())
-	
-	if scene == \"gameplay\":
-		$\"../Debugger\".text += \"\\nPosition: \" + str($/root/Level/Player.position) + \"
-		Velocity: \" + str($/root/Level/Player.velocity)
-
 	if Input.is_action_just_pressed(\"exit\"):
 		match scene:
 			\"main_menu\":
@@ -110,6 +102,16 @@ func update_debugger():
 				scene = \"main_menu\"
 			\"gameplay\":
 				pass
+
+func update_debugger():
+	$\"../Debugger\".text = \"FPS: \" + str(fps)
+	if scene == \"gameplay\":
+		$\"../Debugger\".text += \"\\nPosition: \" + str($/root/Level/Player.position) + \"
+		Velocity: \" + str($/root/Level/Player.velocity)
+
+	fps += 1
+	await get_tree().create_timer(1).timeout
+	fps -= 1
 
 func _on_icons_pressed() -> void:
 	$AnimationPlayer.queue(\"icon_selector_appear\")
