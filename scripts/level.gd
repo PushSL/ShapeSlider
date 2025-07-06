@@ -1,6 +1,6 @@
 extends Node2D
 var ground_color: Color = Color8(0, 255, 102, 255)
-@export var object_data: Array
+var object_data: Array
 #For level_data it goes object(int), position.x(float), position.y(float), layer(int)
 
 func _process(_delta: float) -> void:
