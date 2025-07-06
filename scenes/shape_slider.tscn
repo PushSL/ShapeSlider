@@ -1,0 +1,2293 @@
+[gd_scene load_steps=22 format=3 uid="uid://kmxvuqn0i1vg"]
+
+[ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
+[ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
+[ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/Cubes/player_73-uhd.png" id="4_krlm5"]
+[ext_resource type="Texture2D" uid="uid://gy0cxdrsgna3" path="res://textures/Reshade Logo.png" id="4_p0lug"]
+[ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
+[ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/Mono Saneness Dark.tres" id="8_0s0e1"]
+[ext_resource type="PackedScene" uid="uid://dlq5heiw3swc8" path="res://scenes/level.tscn" id="10_yxe21"]
+[ext_resource type="PackedScene" uid="uid://ca7rvhkwva4jj" path="res://scenes/player.tscn" id="11_qmfet"]
+
+[sub_resource type="GDScript" id="GDScript_wakvg"]
+resource_name = "Menu"
+script/source = "extends Control
+var scene: String = \"main_menu\"
+var primary_color: Color
+var secondary_color: Color
+var glow_color: Color
+var current_level: int = 0
+var levels: int = 2
+var level_hard_best: Array = range(levels)
+var level_easy_best: Array = range(levels)
+var data = ConfigFile.new()
+var err = data.load(\"user://data.cfg\")
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	load_data()
+	$\"Main Menu\".visible = true
+	$\"Icon Menu\".visible = false
+	$\"Color Menu\".visible = false
+	$\"Level Selector\".visible = false
+	$BG.visible = true
+	$\"../../Level\".visible = false
+	$\"Color Menu/Color Picker/Primary\".color = primary_color
+	$\"Color Menu/Color Picker/Secondary\".color = secondary_color
+	$\"Color Menu/Color Picker/Glow\".color = glow_color
+	$\"Color Menu/Preview/Primary\".modulate = primary_color
+	$\"Color Menu/Preview/Secondary\".modulate = secondary_color
+	$\"Color Menu/Preview/Glow\".modulate = glow_color
+	$\"../../Level/Player/Sprite/Primary\".modulate = primary_color
+	$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
+	$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
+	$\"../../Level/Player/Camera2D\".enabled = false
+
+func save_data(option: String = \"all\"):
+	if option == \"all\" or \"level_best\":
+		for level in levels:
+			data.set_value(\"easy_best\", str(level), level_easy_best[level])
+			data.set_value(\"hard_best\", str(level), level_hard_best[level])
+	if option == \"all\" or \"player_color\":
+			data.set_value(\"player_color\", \"primary\", primary_color)
+			data.set_value(\"player_color\", \"secondary\", secondary_color)
+			data.set_value(\"player_color\", \"glow\", glow_color)
+			print(data.get_value(\"player_color\", \"glow\"))
+	data.save(\"user://data.cfg\")
+func load_data(option: String = \"all\"):
+	if option == \"all\" or \"level_best\":
+		for level in levels:
+			level_easy_best[level] = data.get_value(\"easy_best\", str(level), 0)
+			level_hard_best[level] = data.get_value(\"hard_best\", str(level), 0)
+	if option == \"all\" or \"player_color\":
+			primary_color = data.get_value(\"player_color\", \"primary\", Color(1, 1, 1, 1))
+			secondary_color = data.get_value(\"player_color\", \"secondary\", Color(0, 1, 1, 1 ))
+			glow_color = data.get_value(\"player_color\", \"glow\", Color(0, 1, 1, 1))
+
+func _process(delta: float) -> void:
+	$\"../Debugger\".text = str(Engine.get_frames_per_second())
+	match scene:
+		\"color_selector\":
+			$\"../../Level/Player/Sprite/Primary\".modulate = primary_color
+			$\"../../Level/Player/Sprite/Secondary\".modulate = secondary_color
+			$\"../../Level/Player/Sprite/Glow\".modulate = glow_color
+		\"level_selector\":
+			$\"Level Selector/Easy Mode Best\".value = level_easy_best[current_level]
+			$\"Level Selector/Hard Mode Best\".value = level_hard_best[current_level]
+			if Input.is_action_just_pressed(\"left\") and current_level != 0:
+				current_level -= 1
+			if Input.is_action_just_pressed(\"right\") and current_level != levels - 1:
+				current_level += 1
+			match current_level:
+				0:
+					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
+					$\"Level Selector/Start/Description/Moon\".position = Vector2(297, -6)
+					$\"Level Selector/Start\".text = \"Mono Saneness\"
+					$\"Level Selector\".texture = load(\"res://levels/Mono Saneness.tres\")
+					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Mono Saneness Dark.tres\")
+				1:
+					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/2 (2  )\"
+					$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
+					$\"Level Selector/Start\".text = \"Front Off Track\"
+					$\"Level Selector\".texture = load(\"res://levels/Front Off Track.tres\")
+					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Front Off Track Dark.tres\")
+					
+
+	if Input.is_action_just_pressed(\"exit\"):
+		match scene:
+			\"main_menu\":
+				pass
+			\"icon_selector\":
+				$AnimationPlayer.queue(\"icon_selector_disappear\")
+				scene = \"main_menu\"
+			\"color_selector\":
+				$AnimationPlayer.queue(\"color_selector_disappear\")
+				scene = \"icon_selector\"
+			\"level_selector\":
+				$AnimationPlayer.queue(\"level_selector_disappear\")
+				scene = \"main_menu\"
+			\"gameplay\":
+				pass
+
+func _on_icons_pressed() -> void:
+	$AnimationPlayer.queue(\"icon_selector_appear\")
+	scene = \"icon_selector\"
+
+func _on_play_pressed() -> void:
+	$AnimationPlayer.queue(\"level_selector_appear\")
+	scene = \"level_selector\"
+
+
+func _on_color_selector_pressed() -> void:
+	if scene == \"icon_selector\":
+		$AnimationPlayer.queue(\"color_selector_appear\")
+		scene = \"color_selector\"
+	elif scene == \"color_selector\":
+		$AnimationPlayer.queue(\"color_selector_disappear\")
+		scene = \"icon_selector\"
+
+
+func _on_primary_color_changed(color: Color) -> void:
+	primary_color = color
+	$\"Color Menu/Preview/Primary\".modulate = color
+	save_data(\"player_color\")
+
+
+func _on_secondary_color_changed(color: Color) -> void:
+	secondary_color = color
+	$\"Color Menu/Preview/Secondary\".modulate = color
+	save_data(\"player_color\")
+
+func _on_glow_color_changed(color: Color) -> void:
+	glow_color = color
+	$\"Color Menu/Preview/Glow\".modulate = color
+	save_data(\"player_color\")
+
+
+func _on_start_pressed() -> void:
+	scene = \"gameplay\"
+	$\"../../Level/Player/Camera2D\".enabled = true
+	$\"../../Level\".visible = true
+	$\"Main Menu\".queue_free()
+	$\"Icon Menu\".queue_free()
+	$\"Color Menu\".queue_free()
+	$\"Level Selector\".queue_free()
+	$BG.queue_free()
+
+
+func _on_editor_pressed() -> void:
+	pass # Replace with function body.
+"
+
+[sub_resource type="Theme" id="Theme_m4023"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4023"]
+bg_color = Color(0.688156, 0, 0.131207, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="Theme" id="Theme_qmfet"]
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_m4023")
+
+[sub_resource type="Animation" id="Animation_p0lug"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Icon Menu:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BG:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Level Selector:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Level Selector:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("BG:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_384sr"]
+resource_name = "color_selector_appear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Color Menu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(449, -325), Vector2(449, 400)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Color Menu:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_m16bh"]
+resource_name = "color_selector_disappear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Color Menu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(449, 400), Vector2(449, -325)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Color Menu:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_wakvg"]
+resource_name = "appear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Icon Menu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(117, -950), Vector2(117, 68)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Icon Menu:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BG:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -100)]
+}
+
+[sub_resource type="Animation" id="Animation_awdnd"]
+resource_name = "disappear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Icon Menu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(117, 68), Vector2(117, -950)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Icon Menu:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BG:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(0, -100), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_m4023"]
+resource_name = "level_selector_appear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BG:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(5.96046e-08, 0.266667),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 200)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BG:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.266667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Level Selector:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Level Selector:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.266667, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_vymbj"]
+resource_name = "level_selector_disappear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BG:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.333333, 0.75),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector2(0, 200), Vector2(0, 200), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BG:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Level Selector:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Level Selector:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_awdnd"]
+_data = {
+&"RESET": SubResource("Animation_p0lug"),
+&"color_selector_appear": SubResource("Animation_384sr"),
+&"color_selector_disappear": SubResource("Animation_m16bh"),
+&"icon_selector_appear": SubResource("Animation_wakvg"),
+&"icon_selector_disappear": SubResource("Animation_awdnd"),
+&"level_selector_appear": SubResource("Animation_m4023"),
+&"level_selector_disappear": SubResource("Animation_vymbj")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y81wf"]
+size = Vector2(1920, 190)
+
+[node name="ShapeSlider" type="Node2D"]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Menu" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = SubResource("GDScript_wakvg")
+
+[node name="Main Menu" type="GridContainer" parent="UI/Menu"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -62.0
+offset_right = 190.0
+offset_bottom = 62.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+theme_override_constants/h_separation = 85
+columns = 3
+
+[node name="Icons" type="Button" parent="UI/Menu/Main Menu"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+focus_mode = 0
+theme = SubResource("Theme_m4023")
+text = "Icons"
+
+[node name="Play" type="Button" parent="UI/Menu/Main Menu"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+focus_mode = 0
+text = "Play"
+
+[node name="Editor" type="Button" parent="UI/Menu/Main Menu"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+focus_mode = 0
+text = "Editor"
+
+[node name="Level Selector" type="NinePatchRect" parent="UI/Menu"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_0s0e1")
+
+[node name="Start" type="Button" parent="UI/Menu/Level Selector"]
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -256.5
+offset_top = -24.5
+offset_right = 256.5
+offset_bottom = 24.5
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("1_jqa43")
+theme_override_font_sizes/font_size = 64
+text = "Mono Saneness"
+flat = true
+
+[node name="TextureRect" type="TextureRect" parent="UI/Menu/Level Selector/Start"]
+z_index = -1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -540.0
+offset_top = -195.0
+offset_right = 540.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_0s0e1")
+
+[node name="Description" type="Label" parent="UI/Menu/Level Selector/Start"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -168.0
+offset_top = 34.0
+offset_right = 226.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+theme_override_colors/font_color = Color(0.593134, 0.593134, 0.593134, 1)
+theme_override_font_sizes/font_size = 24
+text = "Difficulty: Ease/1.5 (1.5  )"
+
+[node name="Moon" type="TextureRect" parent="UI/Menu/Level Selector/Start/Description"]
+layout_mode = 0
+offset_left = 297.0
+offset_top = -6.0
+offset_right = 321.0
+offset_bottom = 18.0
+texture = ExtResource("7_m4023")
+expand_mode = 2
+
+[node name="Easy Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 830.0
+offset_right = 1500.0
+offset_bottom = 862.0
+theme = ExtResource("3_chx57")
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector/Easy Mode Best"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.0
+offset_top = -30.0
+offset_right = 42.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Easy Mode"
+
+[node name="Hard Mode Best" type="ProgressBar" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 883.0
+offset_right = 1500.0
+offset_bottom = 915.0
+theme = SubResource("Theme_qmfet")
+theme_override_fonts/font = ExtResource("1_jqa43")
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector/Hard Mode Best"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.0
+offset_top = -30.0
+offset_right = 42.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+text = "Hard Mode"
+
+[node name="Label" type="Label" parent="UI/Menu/Level Selector"]
+layout_mode = 0
+offset_left = 980.0
+offset_top = 253.0
+offset_right = 1020.0
+offset_bottom = 276.0
+
+[node name="Icon Menu" type="PanelContainer" parent="UI/Menu"]
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -843.0
+offset_top = -472.0
+offset_right = 877.0
+offset_bottom = 453.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+
+[node name="Color Selector" type="Button" parent="UI/Menu/Icon Menu"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+focus_mode = 0
+icon = ExtResource("4_p0lug")
+expand_icon = true
+
+[node name="Icon Selector" type="GridContainer" parent="UI/Menu/Icon Menu"]
+custom_minimum_size = Vector2(0, 216)
+layout_mode = 2
+size_flags_vertical = 8
+columns = 23
+
+[node name="Icon 1" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 1"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 1"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 2" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 2"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 2"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 3" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 3"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 3"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 4" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 4"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 4"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 5" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 5"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 5"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 6" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 6"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 6"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 7" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 7"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 7"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 8" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 8"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 8"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 9" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 9"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 9"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 10" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 10"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 10"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 11" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 11"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 11"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 12" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 12"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 12"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 13" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 13"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 13"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 14" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 14"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 14"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 15" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 15"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 15"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 16" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 16"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 16"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 17" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 17"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 17"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 18" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 18"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 18"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 19" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 19"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 19"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 20" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 20"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 20"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 21" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 21"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 21"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 22" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 22"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 22"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 23" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 23"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 23"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 24" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 24"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 24"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 25" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 25"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 25"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 26" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 26"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 26"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 27" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 27"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 27"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 28" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 28"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 28"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 29" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 29"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 29"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 30" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 30"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 30"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 31" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 31"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 31"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 32" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 32"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 32"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 33" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 33"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 33"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 34" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 34"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 34"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 35" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 35"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 35"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 36" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 36"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 36"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 37" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 37"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 37"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 38" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 38"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 38"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 39" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 39"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 39"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 40" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 40"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 40"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 41" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 41"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 41"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 42" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 42"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 42"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 43" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 43"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 43"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 44" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 44"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 44"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 45" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 45"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 45"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 46" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 46"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 46"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 47" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 47"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 47"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 48" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 48"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 48"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 49" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 49"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 49"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 50" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 50"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 50"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 51" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 51"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 51"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 52" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 52"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 52"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 53" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 53"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 53"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 54" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 54"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 54"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 55" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 55"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 55"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 56" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 56"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 56"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 57" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 57"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 57"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 58" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 58"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 58"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 59" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 59"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 59"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 60" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 60"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 60"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 61" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 61"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 61"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 62" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 62"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 62"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 63" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 63"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 63"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 64" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 64"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 64"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 65" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 65"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 65"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 66" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 66"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 66"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 67" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 67"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 67"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 68" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 68"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 68"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Icon 69" type="Button" parent="UI/Menu/Icon Menu/Icon Selector"]
+clip_contents = true
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+focus_mode = 0
+flat = true
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 69"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Icon Menu/Icon Selector/Icon 69"]
+position = Vector2(33.98, 33.98)
+scale = Vector2(0.533, 0.533)
+texture = ExtResource("4_krlm5")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Color Menu" type="PanelContainer" parent="UI/Menu"]
+visible = false
+z_index = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -535.0
+offset_top = -888.5
+offset_right = 533.0
+offset_bottom = -572.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_chx57")
+
+[node name="Color Picker" type="GridContainer" parent="UI/Menu/Color Menu"]
+layout_mode = 2
+columns = 3
+
+[node name="Primary" type="ColorPickerButton" parent="UI/Menu/Color Menu/Color Picker"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Menu/Color Menu/Color Picker/Primary"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 204.0
+offset_right = 204.0
+offset_bottom = 227.0
+theme = ExtResource("3_chx57")
+text = "Primary"
+horizontal_alignment = 1
+
+[node name="Secondary" type="ColorPickerButton" parent="UI/Menu/Color Menu/Color Picker"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+edit_alpha = false
+
+[node name="Secondary" type="Label" parent="UI/Menu/Color Menu/Color Picker/Secondary"]
+layout_mode = 2
+offset_top = 204.0
+offset_right = 200.0
+offset_bottom = 227.0
+theme = ExtResource("3_chx57")
+text = "Secondary"
+horizontal_alignment = 1
+
+[node name="Glow" type="ColorPickerButton" parent="UI/Menu/Color Menu/Color Picker"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+edit_alpha = false
+
+[node name="Glow" type="Label" parent="UI/Menu/Color Menu/Color Picker/Glow"]
+layout_mode = 2
+offset_top = 204.0
+offset_right = 200.0
+offset_bottom = 227.0
+theme = ExtResource("3_chx57")
+text = "Glow"
+horizontal_alignment = 1
+
+[node name="Preview" type="Control" parent="UI/Menu/Color Menu"]
+custom_minimum_size = Vector2(248, 248)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="Secondary" type="Sprite2D" parent="UI/Menu/Color Menu/Preview"]
+scale = Vector2(2, 2)
+texture = ExtResource("4_krlm5")
+offset = Vector2(60, 60)
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="UI/Menu/Color Menu/Preview"]
+scale = Vector2(2, 2)
+texture = ExtResource("4_krlm5")
+offset = Vector2(60, 60)
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Glow" type="Sprite2D" parent="UI/Menu/Color Menu/Preview"]
+scale = Vector2(2, 2)
+texture = ExtResource("4_krlm5")
+offset = Vector2(60, 60)
+region_enabled = true
+region_rect = Rect2(1, 1, 130, 130)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UI/Menu"]
+libraries = {
+&"": SubResource("AnimationLibrary_awdnd")
+}
+
+[node name="BG" type="Node2D" parent="UI/Menu"]
+
+[node name="Floor" type="StaticBody2D" parent="UI/Menu/BG"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UI/Menu/BG/Floor"]
+position = Vector2(960, 985)
+shape = SubResource("RectangleShape2D_y81wf")
+
+[node name="Panel" type="Panel" parent="UI/Menu/BG/Floor"]
+offset_left = -82.0
+offset_top = 890.0
+offset_right = 2074.0
+offset_bottom = 1866.0
+theme = ExtResource("3_chx57")
+metadata/_edit_use_anchors_ = true
+
+[node name="Debugger" type="Label" parent="UI"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 44.0
+offset_bottom = 27.0
+theme = ExtResource("3_chx57")
+
+[node name="Level" parent="." instance=ExtResource("10_yxe21")]
+visible = false
+
+[node name="Player" parent="Level" instance=ExtResource("11_qmfet")]
+position = Vector2(48, -48)
+
+[connection signal="pressed" from="UI/Menu/Main Menu/Icons" to="UI/Menu" method="_on_icons_pressed"]
+[connection signal="pressed" from="UI/Menu/Main Menu/Play" to="UI/Menu" method="_on_play_pressed"]
+[connection signal="pressed" from="UI/Menu/Main Menu/Editor" to="UI/Menu" method="_on_editor_pressed"]
+[connection signal="pressed" from="UI/Menu/Level Selector/Start" to="UI/Menu" method="_on_start_pressed"]
+[connection signal="pressed" from="UI/Menu/Icon Menu/Color Selector" to="UI/Menu" method="_on_color_selector_pressed"]
+[connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Primary" to="UI/Menu" method="_on_primary_color_changed"]
+[connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Secondary" to="UI/Menu" method="_on_secondary_color_changed"]
+[connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Glow" to="UI/Menu" method="_on_glow_color_changed"]

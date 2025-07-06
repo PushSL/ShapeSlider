@@ -1,0 +1,74 @@
+[gd_scene load_steps=7 format=3 uid="uid://ca7rvhkwva4jj"]
+
+[ext_resource type="Script" uid="uid://bapyf443teuy1" path="res://scripts/player.gd" id="1_onrkg"]
+[ext_resource type="Shader" uid="uid://c1ae5il32sg4y" path="res://scenes/player.gdshader" id="1_qhqgy"]
+[ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/Cubes/player_73-uhd.png" id="2_i3pqv"]
+[ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="4_dqkch"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qhqgy"]
+shader = ExtResource("1_qhqgy")
+shader_parameter/intensity = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_krlm5"]
+size = Vector2(95, 95)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_onrkg")
+
+[node name="Sprite" type="Node2D" parent="."]
+material = SubResource("ShaderMaterial_qhqgy")
+
+[node name="Secondary" type="Sprite2D" parent="Sprite"]
+use_parent_material = true
+scale = Vector2(0.799, 0.799)
+texture = ExtResource("2_i3pqv")
+region_enabled = true
+region_rect = Rect2(123, 129, 94, 100)
+
+[node name="Primary" type="Sprite2D" parent="Sprite"]
+use_parent_material = true
+scale = Vector2(0.799, 0.799)
+texture = ExtResource("2_i3pqv")
+region_enabled = true
+region_rect = Rect2(2, 132, 120, 120)
+
+[node name="Glow" type="Sprite2D" parent="Sprite"]
+z_index = 10
+use_parent_material = true
+scale = Vector2(0.799, 0.799)
+texture = ExtResource("2_i3pqv")
+region_enabled = true
+region_rect = Rect2(1, 1, 130, 130)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_krlm5")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(304, -187)
+position_smoothing_enabled = true
+position_smoothing_speed = 15.0
+drag_vertical_enabled = true
+drag_top_margin = 0.8
+drag_bottom_margin = 0.8
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = -149.0
+offset_right = 2.0
+offset_bottom = -128.0
+theme = ExtResource("4_dqkch")
+theme_override_font_sizes/font_size = 32
+
+[node name="Label2" type="Label" parent="Control"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = -213.0
+offset_right = 2.0
+offset_bottom = -192.0
+theme = ExtResource("4_dqkch")
+theme_override_font_sizes/font_size = 32

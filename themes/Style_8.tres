@@ -1,0 +1,50 @@
+[gd_resource type="Theme" load_steps=10 format=3 uid="uid://bhgecd6ya6p23"]
+
+[ext_resource type="StyleBox" uid="uid://bsssbhqi2vbwf" path="res://themes/Style_Box_8.tres" id="1_wk2qy"]
+[ext_resource type="Texture2D" uid="uid://ymq6xjravai0" path="res://themes/Square8.png" id="2_gambr"]
+[ext_resource type="StyleBox" uid="uid://csxsqlnb4j2bv" path="res://themes/Style_Box_8_hover.tres" id="3_b2l24"]
+[ext_resource type="StyleBox" uid="uid://fsivcorgrat" path="res://themes/Style_8_panel.tres" id="3_qnqa3"]
+[ext_resource type="StyleBox" uid="uid://gn3qeq4fu2tq" path="res://themes/Style_Box_8_pressed.tres" id="4_qirdv"]
+[ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="5_b2l24"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gp85j"]
+texture = ExtResource("2_gambr")
+texture_margin_left = 34.0
+texture_margin_top = 34.0
+texture_margin_right = 34.0
+texture_margin_bottom = 34.0
+modulate_color = Color(0.886262, 0.886261, 0.886262, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pteg0"]
+texture = ExtResource("2_gambr")
+texture_margin_left = 34.0
+texture_margin_top = 34.0
+texture_margin_right = 34.0
+texture_margin_bottom = 34.0
+modulate_color = Color(0.65834, 0.65834, 0.65834, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b2l24"]
+bg_color = Color(0, 0.784314, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[resource]
+Button/colors/font_hover_color = Color(0.621524, 0.621524, 0.621524, 1)
+Button/colors/font_hover_pressed_color = Color(0.77084, 0.770839, 0.770839, 1)
+Button/colors/font_pressed_color = Color(0.621524, 0.621524, 0.621524, 1)
+Button/styles/disabled = ExtResource("1_wk2qy")
+Button/styles/focus = ExtResource("1_wk2qy")
+Button/styles/hover = SubResource("StyleBoxTexture_gp85j")
+Button/styles/normal = ExtResource("1_wk2qy")
+Button/styles/pressed = SubResource("StyleBoxTexture_pteg0")
+ColorPickerButton/styles/focus = null
+ColorPickerButton/styles/hover = ExtResource("3_b2l24")
+ColorPickerButton/styles/normal = ExtResource("1_wk2qy")
+ColorPickerButton/styles/pressed = ExtResource("4_qirdv")
+Label/fonts/font = ExtResource("5_b2l24")
+Panel/styles/panel = ExtResource("3_qnqa3")
+PanelContainer/styles/panel = ExtResource("3_qnqa3")
+ProgressBar/fonts/font = ExtResource("5_b2l24")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_b2l24")
