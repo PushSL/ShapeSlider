@@ -1,12 +1,17 @@
 extends CharacterBody2D
+
 const JUMP_VELOCITY = -1900
+var dead: bool = false
 
 func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("reset"):
 		kill(0)
 	if velocity.y > 5000:
 		velocity.y = 5000
-	position.x += 937 * delta
+	
+	if !dead:
+		velocity.x = 937
+	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		$Sprite.rotate(6.5 * delta)
@@ -18,17 +23,14 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func kill(time = 0.75):
-	if get_tree().paused == false:
-		$Sprite/Camera2D.position_smoothing_enabled = false
-		get_tree().paused = true
-		if time != 0:
-			await get_tree().create_timer(time).timeout
-		$Sprite.rotation_degrees = 0
-		position = Vector2(48, -48)
-		velocity = Vector2.ZERO
-		get_tree().paused = false
-		await get_tree().create_timer(0).timeout
-		$Sprite/Camera2D.position_smoothing_enabled = true
+	dead = true
+	await get_tree().create_timer(time).timeout
+	$Sprite/Camera2D.position_smoothing_enabled = false
+	position = Vector2(48, -48)
+	velocity = Vector2.ZERO
+	$Sprite.rotation_degrees = 0
+	dead = false
+	$Sprite/Camera2D.position_smoothing_enabled = true
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.name == "Spike":

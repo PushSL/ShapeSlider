@@ -89,7 +89,11 @@ func _process(delta: float) -> void:
 					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Front Off Track Dark.tres\")
 
 func update_debugger():
-	$\"../Debugger\".text = str(Engine.get_frames_per_second())
+	$\"../Debugger\".text = \"FPS: \" + str(Engine.get_frames_per_second())
+	
+	if scene == \"gameplay\":
+		$\"../Debugger\".text += \"\\nPosition: \" + str($/root/Level/Player.position) + \"
+		Velocity: \" + str($/root/Level/Player.velocity)
 
 	if Input.is_action_just_pressed(\"exit\"):
 		match scene:
@@ -144,7 +148,6 @@ func _on_glow_color_changed(color: Color) -> void:
 
 func _on_start_pressed() -> void:
 	if scene != \"gameplay\":
-		scene = \"gameplay\"
 		$\"Level Selector/AudioStreamPlayer2D\".stream = preload(\"res://sounds/start_level.ogg\")
 		$\"Level Selector/AudioStreamPlayer2D\".play()
 		await $\"Level Selector/AudioStreamPlayer2D\".finished
@@ -152,13 +155,14 @@ func _on_start_pressed() -> void:
 		$\"Icon Menu\".queue_free()
 		$\"Color Menu\".queue_free()
 		var level = load(str(level_data[current_level])).instantiate()
-		$/root.add_child(level)
 		var player = preload(\"res://scenes/player.tscn\").instantiate()
+		$/root.add_child(level)
 		$/root/Level.add_child(player)
 		$BG.queue_free()
 		$\"Level Selector\".queue_free()
 		$/root/Level/Player/Sprite/Secondary.modulate = secondary_color
 		$/root/Level/Player/Sprite/Glow.modulate = glow_color
+		scene = \"gameplay\"
 
 
 
