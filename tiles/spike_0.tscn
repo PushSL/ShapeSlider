@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cl7bhn748s2tp"]
+
+[ext_resource type="PackedScene" uid="uid://bel7exw0tugrw" path="res://tiles/base_spike.tscn" id="1_xs7ml"]
+[ext_resource type="Texture2D" uid="uid://de2pkbtmgvox1" path="res://tiles/Spike.svg" id="2_gj21h"]
+
+[node name="Spike" instance=ExtResource("1_xs7ml")]
+
+[node name="Sprite2D" parent="." index="1"]
+texture = ExtResource("2_gj21h")

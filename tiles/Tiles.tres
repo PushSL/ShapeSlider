@@ -1,21 +1,19 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://6ctl3rrevivt"]
 
-[ext_resource type="PackedScene" uid="uid://7aufjwrfim4e" path="res://tiles/spike0.tscn" id="1_yuofr"]
-[ext_resource type="Texture2D" uid="uid://dlo2qjotaruw0" path="res://tiles/block.svg" id="2_tc8rk"]
+[ext_resource type="PackedScene" uid="uid://cl7bhn748s2tp" path="res://tiles/spike_0.tscn" id="1_yuofr"]
+[ext_resource type="PackedScene" uid="uid://ddryw24sdvv0p" path="res://tiles/block_0.tscn" id="2_tc8rk"]
 
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_saaj4"]
-resource_name = "Spike_0"
-scenes/1/scene = ExtResource("1_yuofr")
+resource_name = "Spikes"
+scenes/2/scene = ExtResource("1_yuofr")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nf0no"]
-texture = ExtResource("2_tc8rk")
-texture_region_size = Vector2i(128, 128)
-0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_ij57i"]
+resource_name = "Blocks"
+scenes/1/scene = ExtResource("2_tc8rk")
 
 [resource]
 tile_size = Vector2i(128, 128)
 physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 0
-sources/2 = SubResource("TileSetAtlasSource_nf0no")
 sources/0 = SubResource("TileSetScenesCollectionSource_saaj4")
+sources/2 = SubResource("TileSetScenesCollectionSource_ij57i")
