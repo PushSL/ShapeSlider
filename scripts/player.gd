@@ -26,7 +26,8 @@ func kill(time = 0.75):
 		$Sprite.rotation_degrees = 0
 		position = Vector2(48, -48)
 		velocity = Vector2.ZERO
-		get_tree().reload_current_scene()
+		get_tree().paused = false
+		await get_tree().create_timer(0).timeout
 		$Camera2D.position_smoothing_enabled = true
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
