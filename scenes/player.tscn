@@ -40,6 +40,11 @@ texture = ExtResource("2_i3pqv")
 region_enabled = true
 region_rect = Rect2(1, 1, 130, 130)
 
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_krlm5")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_krlm5")
 
@@ -72,3 +77,5 @@ offset_right = 2.0
 offset_bottom = -192.0
 theme = ExtResource("4_dqkch")
 theme_override_font_sizes/font_size = 32
+
+[connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
