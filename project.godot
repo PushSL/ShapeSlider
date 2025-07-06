@@ -23,10 +23,6 @@ window/size/borderless=true
 
 [input]
 
-<null>={
-"deadzone": null,
-"events": null
-}
 ui_accept={
 "deadzone": 0.5,
 "events": []
@@ -330,6 +326,10 @@ ui_filedialog_show_hidden={
 ui_swap_input_direction={
 "deadzone": 0.5,
 "events": []
+}
+<null>={
+"deadzone": null,
+"events": null
 }
 exit={
 "deadzone": 0.2,
