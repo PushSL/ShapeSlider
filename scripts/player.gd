@@ -19,7 +19,7 @@ func _physics_process(delta: float) -> void:
 
 func kill(time = 0.75):
 	if get_tree().paused == false:
-		$Camera2D.position_smoothing_enabled = false
+		$Sprite/Camera2D.position_smoothing_enabled = false
 		get_tree().paused = true
 		if time != 0:
 			await get_tree().create_timer(time).timeout
@@ -28,7 +28,7 @@ func kill(time = 0.75):
 		velocity = Vector2.ZERO
 		get_tree().paused = false
 		await get_tree().create_timer(0).timeout
-		$Camera2D.position_smoothing_enabled = true
+		$Sprite/Camera2D.position_smoothing_enabled = true
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.name == "Spike":

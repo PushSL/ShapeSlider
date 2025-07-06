@@ -60,7 +60,8 @@ func load_data(option: String = \"all\"):
 			glow_color = data.get_value(\"player_color\", \"glow\", Color(0, 1, 1, 1))
 
 func _process(delta: float) -> void:
-	$\"../Debugger\".text = str(Engine.get_frames_per_second())
+	update_debugger()
+	
 	match scene:
 		\"color_selector\":
 			pass
@@ -86,7 +87,9 @@ func _process(delta: float) -> void:
 					$\"Level Selector/Start\".text = \"Front Off Track\"
 					$\"Level Selector\".texture = load(\"res://levels/Front Off Track.tres\")
 					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Front Off Track Dark.tres\")
-					
+
+func update_debugger():
+	$\"../Debugger\".text = str(Engine.get_frames_per_second())
 
 	if Input.is_action_just_pressed(\"exit\"):
 		match scene:
