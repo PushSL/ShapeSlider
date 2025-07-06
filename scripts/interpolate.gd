@@ -12,7 +12,7 @@ func _ready():
 
 func _process(_delta):
 
-	if Engine.get_frames_per_second() >= Engine.physics_ticks_per_second:
+	if Engine.get_frames_per_second() > Engine.physics_ticks_per_second:
 		set_global_position(m_Pos_prev.lerp(m_Pos_curr, Engine.get_physics_interpolation_fraction()))
 
 func _physics_process(_delta):

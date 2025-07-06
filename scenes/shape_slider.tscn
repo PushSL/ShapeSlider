@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://kmxvuqn0i1vg"]
+[gd_scene load_steps=23 format=3 uid="uid://kmxvuqn0i1vg"]
 
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
@@ -30,6 +30,7 @@ func _ready() -> void:
 	$\"Icon Menu\".visible = false
 	$\"Color Menu\".visible = false
 	$\"Level Selector\".visible = false
+	$\"Editor Menu\".visible = false
 	$BG.visible = true
 	$\"Color Menu/Color Picker/Primary\".color = primary_color
 	$\"Color Menu/Color Picker/Secondary\".color = secondary_color
@@ -100,6 +101,9 @@ func _process(_delta: float) -> void:
 			\"level_selector\":
 				$AnimationPlayer.queue(\"level_selector_disappear\")
 				scene = \"main_menu\"
+			\"editor_menu\":
+				$AnimationPlayer.queue(\"editor_menu_disappear\")
+				scene = \"main_menu\"
 			\"gameplay\":
 				pass
 
@@ -108,18 +112,20 @@ func update_debugger():
 	if scene == \"gameplay\":
 		$\"../Debugger\".text += \"\\nPosition: \" + str($/root/Level/Player.position) + \"
 		Velocity: \" + str($/root/Level/Player.velocity)
-
 	fps += 1
 	await get_tree().create_timer(1).timeout
 	fps -= 1
 
 func _on_icons_pressed() -> void:
-	$AnimationPlayer.queue(\"icon_selector_appear\")
-	scene = \"icon_selector\"
+	if scene == \"main_menu\":
+		$AnimationPlayer.queue(\"icon_selector_appear\")
+		scene = \"icon_selector\"
 
 func _on_play_pressed() -> void:
-	$AnimationPlayer.queue(\"level_selector_appear\")
-	scene = \"level_selector\"
+	if scene == \"main_menu\":
+		$AnimationPlayer.queue(\"level_selector_appear\")
+		scene = \"level_selector\"
+		current_level = 0
 
 
 func _on_color_selector_pressed() -> void:
@@ -151,18 +157,12 @@ func _on_glow_color_changed(color: Color) -> void:
 func _on_start_pressed() -> void:
 	if scene != \"loading\":
 		scene = \"loading\"
-		$\"Level Selector/AudioStreamPlayer2D\".stream = preload(\"res://sounds/start_level.ogg\")
-		$\"Level Selector/AudioStreamPlayer2D\".play()
-		await $\"Level Selector/AudioStreamPlayer2D\".finished
-		$\"Main Menu\".queue_free()
-		$\"Icon Menu\".queue_free()
-		$\"Color Menu\".queue_free()
-		var level = load(str(level_data[current_level])).instantiate()
-		var player = preload(\"res://scenes/player.tscn\").instantiate()
-		$/root.add_child(level)
-		$/root/Level.add_child(player)
-		$BG.queue_free()
-		$\"Level Selector\".queue_free()
+		$\"Level Selector/AudioStreamPlayer\".stream = preload(\"res://sounds/start_level.ogg\")
+		$\"Level Selector/AudioStreamPlayer\".play()
+		await $\"Level Selector/AudioStreamPlayer\".finished
+		$/root.add_child(preload(\"res://scenes/base_level.tscn\").instantiate())
+		$/root/Level.add_child(preload(\"res://scenes/player.tscn\").instantiate())
+		visible = false
 		$/root/Level/Player/Sprite/Secondary.modulate = secondary_color
 		$/root/Level/Player/Sprite/Glow.modulate = glow_color
 		scene = \"gameplay\"
@@ -170,7 +170,9 @@ func _on_start_pressed() -> void:
 
 
 func _on_editor_pressed() -> void:
-	pass # Replace with function body.
+	if scene == \"main_menu\":
+		scene = \"editor_menu\"
+		$AnimationPlayer.queue(\"editor_menu_appear\")
 "
 
 [sub_resource type="Theme" id="Theme_m4023"]
@@ -271,6 +273,18 @@ tracks/6/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
 }
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Main Menu:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_384sr"]
 resource_name = "color_selector_appear"
@@ -322,6 +336,86 @@ tracks/1/path = NodePath("Color Menu:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_jqa43"]
+resource_name = "editor_menu_appear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BG:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -100)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Editor Menu:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(117, -950), Vector2(117, 68)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Editor Menu:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.00833333),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_yxe21"]
+resource_name = "editor_menu_disappear"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BG:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(0, -100), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Editor Menu:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(117, 68), Vector2(117, -950)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Editor Menu:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.75),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
@@ -517,6 +611,8 @@ _data = {
 &"RESET": SubResource("Animation_p0lug"),
 &"color_selector_appear": SubResource("Animation_384sr"),
 &"color_selector_disappear": SubResource("Animation_m16bh"),
+&"editor_menu_appear": SubResource("Animation_jqa43"),
+&"editor_menu_disappear": SubResource("Animation_yxe21"),
 &"icon_selector_appear": SubResource("Animation_wakvg"),
 &"icon_selector_disappear": SubResource("Animation_awdnd"),
 &"level_selector_appear": SubResource("Animation_m4023"),
@@ -527,6 +623,7 @@ _data = {
 size = Vector2(1920, 190)
 
 [node name="ShapeSlider" type="Node2D"]
+metadata/_edit_lock_ = true
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -2180,7 +2277,7 @@ offset_top = 253.0
 offset_right = 1020.0
 offset_bottom = 276.0
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="UI/Menu/Level Selector"]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="UI/Menu/Level Selector"]
 stream = ExtResource("5_vymbj")
 
 [node name="Color Menu" type="PanelContainer" parent="UI/Menu"]
@@ -2272,6 +2369,28 @@ texture = ExtResource("4_krlm5")
 offset = Vector2(60, 60)
 region_enabled = true
 region_rect = Rect2(1, 1, 130, 130)
+
+[node name="Editor Menu" type="PanelContainer" parent="UI/Menu"]
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -843.0
+offset_top = -472.0
+offset_right = 877.0
+offset_bottom = 453.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Level" type="Label" parent="UI/Menu/Editor Menu"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 64
+text = "Mono Saneness"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="UI/Menu"]
 libraries = {

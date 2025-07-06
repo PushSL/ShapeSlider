@@ -4,8 +4,9 @@
 size = Vector2(30, 58)
 
 [node name="Spike" type="Area2D"]
+scale = Vector2(0.75, 0.75)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="kill" type="CollisionShape2D" parent="."]
 position = Vector2(0, 11)
 shape = SubResource("RectangleShape2D_rofvc")
 

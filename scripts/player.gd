@@ -45,5 +45,5 @@ func kill(time = 0.75, start_delay = 0.25):
 
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
-	if area.name == "Spike":
+	if area.get_child(0, false).name == "kill":
 		kill()

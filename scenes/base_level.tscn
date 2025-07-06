@@ -1,21 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://dlq5heiw3swc8"]
+[gd_scene load_steps=4 format=3 uid="uid://dlq5heiw3swc8"]
 
 [ext_resource type="Script" uid="uid://chk2bwlvbw7nj" path="res://scripts/level.gd" id="1_0n1tn"]
 [ext_resource type="Texture2D" uid="uid://dcoxpapqu7a4e" path="res://textures/ground-1.png" id="2_oox4p"]
-[ext_resource type="TileSet" uid="uid://6ctl3rrevivt" path="res://tiles/Tiles.tres" id="3_k2uud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0n1tn"]
 size = Vector2(96, 96)
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_0n1tn")
-
-[node name="Song" type="AudioStreamPlayer" parent="."]
-autoplay = true
+metadata/_edit_lock_ = true
 
 [node name="Ground" type="StaticBody2D" parent="."]
 z_index = 5
 collision_mask = 0
+metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
 position = Vector2(0, 48)
@@ -48,42 +46,29 @@ offset_bottom = 1089.0
 color = Color(0, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="T4" type="TileMapLayer" parent="."]
+[node name="Song" type="AudioStreamPlayer" parent="."]
+autoplay = true
+
+[node name="T4" type="Node2D" parent="."]
 z_index = 4
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="T3" type="TileMapLayer" parent="."]
+[node name="T3" type="Node2D" parent="."]
 z_index = 3
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="T2" type="TileMapLayer" parent="."]
+[node name="T2" type="Node2D" parent="."]
 z_index = 2
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="T1" type="TileMapLayer" parent="."]
+[node name="T1" type="Node2D" parent="."]
 z_index = 1
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="B1" type="TileMapLayer" parent="."]
+[node name="B1" type="Node2D" parent="."]
 z_index = -1
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="B2" type="TileMapLayer" parent="."]
+[node name="B2" type="Node2D" parent="."]
 z_index = -2
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="B3" type="TileMapLayer" parent="."]
+[node name="B3" type="Node2D" parent="."]
 z_index = -3
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
 
-[node name="B4" type="TileMapLayer" parent="."]
+[node name="B4" type="Node2D" parent="."]
 z_index = -4
-scale = Vector2(0.75, 0.75)
-tile_set = ExtResource("3_k2uud")
