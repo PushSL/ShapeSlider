@@ -19,7 +19,7 @@ var current_level: int = 0
 var levels: int = 2
 var level_hard_best: Array = range(levels)
 var level_easy_best: Array = range(levels)
-var level_data: Array = [\"res://levels/Mono Saneness.tscn\", 1]
+var level_data = [\"res://levels/Mono Saneness.tscn\", 1]
 var data = ConfigFile.new()
 var err = data.load(\"user://data.cfg\")
 # Called when the node enters the scene tree for the first time.
@@ -528,10 +528,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("3_chx57")
 script = SubResource("GDScript_wakvg")
 
 [node name="Main Menu" type="GridContainer" parent="UI/Menu"]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

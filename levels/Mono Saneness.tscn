@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://b4mvdgqk8lxqn"]
+[gd_scene load_steps=3 format=3 uid="uid://b4mvdgqk8lxqn"]
 
 [ext_resource type="PackedScene" uid="uid://dlq5heiw3swc8" path="res://scenes/base_level.tscn" id="1_dehww"]
+[ext_resource type="AudioStream" uid="uid://dk7otl2ic7aj7" path="res://sounds/StereoMadness.mp3" id="2_bbliv"]
 
 [node name="Level" instance=ExtResource("1_dehww")]
 
-[node name="T1" parent="." index="4"]
-tile_map_data = PackedByteArray(0, 0, 13, 0, 255, 255, 0, 0, 0, 0, 0, 0, 1, 0)
+[node name="Song" parent="." index="0"]
+stream = ExtResource("2_bbliv")
+
+[node name="T1" parent="." index="5"]
+tile_map_data = PackedByteArray(0, 0, 13, 0, 255, 255, 0, 0, 0, 0, 0, 0, 1, 0, 28, 0, 255, 255, 0, 0, 0, 0, 0, 0, 1, 0, 29, 0, 255, 255, 0, 0, 0, 0, 0, 0, 1, 0)

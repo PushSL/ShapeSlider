@@ -4,11 +4,14 @@
 [ext_resource type="Texture2D" uid="uid://dcoxpapqu7a4e" path="res://textures/ground-1.png" id="2_oox4p"]
 [ext_resource type="TileSet" uid="uid://6ctl3rrevivt" path="res://tiles/Tiles.tres" id="3_k2uud"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_w8frs"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0n1tn"]
 size = Vector2(1028, 512)
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_0n1tn")
+
+[node name="Song" type="AudioStreamPlayer" parent="."]
+autoplay = true
 
 [node name="Ground" type="StaticBody2D" parent="."]
 z_index = 5
@@ -16,22 +19,24 @@ collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
 position = Vector2(514, 256)
-shape = SubResource("RectangleShape2D_w8frs")
+shape = SubResource("RectangleShape2D_0n1tn")
 
 [node name="Control" type="Control" parent="Ground"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
 
 [node name="TextureRect" type="TextureRect" parent="Ground/Control"]
 modulate = Color(0, 0.4, 1, 1)
 layout_mode = 0
-offset_left = -1000.0
-offset_right = 1320.0
+offset_left = -100000.0
+offset_right = 100000.0
 offset_bottom = 512.0
 texture = ExtResource("2_oox4p")
 stretch_mode = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="ColorRect" type="ColorRect" parent="Ground/Control"]
 z_index = -1
@@ -41,6 +46,7 @@ offset_top = 9.0
 offset_right = 1700.0
 offset_bottom = 1089.0
 color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="T4" type="TileMapLayer" parent="."]
 z_index = 4

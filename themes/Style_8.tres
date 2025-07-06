@@ -31,14 +31,14 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
 [resource]
-Button/colors/font_hover_color = Color(0.621524, 0.621524, 0.621524, 1)
-Button/colors/font_hover_pressed_color = Color(0.77084, 0.770839, 0.770839, 1)
-Button/colors/font_pressed_color = Color(0.621524, 0.621524, 0.621524, 1)
+default_font = ExtResource("5_b2l24")
+Button/fonts/font = ExtResource("5_b2l24")
 Button/styles/disabled = ExtResource("1_wk2qy")
 Button/styles/focus = ExtResource("1_wk2qy")
 Button/styles/hover = SubResource("StyleBoxTexture_gp85j")
 Button/styles/normal = ExtResource("1_wk2qy")
 Button/styles/pressed = SubResource("StyleBoxTexture_pteg0")
+ColorPickerButton/fonts/font = ExtResource("5_b2l24")
 ColorPickerButton/styles/focus = null
 ColorPickerButton/styles/hover = ExtResource("3_b2l24")
 ColorPickerButton/styles/normal = ExtResource("1_wk2qy")

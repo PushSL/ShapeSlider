@@ -21,12 +21,12 @@ window/size/viewport_height=1080
 window/size/mode=3
 window/size/borderless=true
 
+[gui]
+
+theme/custom_font="uid://c7jv4p3cy0deq"
+
 [input]
 
-<null>={
-"deadzone": null,
-"events": null
-}
 ui_accept={
 "deadzone": 0.5,
 "events": []
@@ -330,6 +330,10 @@ ui_filedialog_show_hidden={
 ui_swap_input_direction={
 "deadzone": 0.5,
 "events": []
+}
+<null>={
+"deadzone": null,
+"events": null
 }
 exit={
 "deadzone": 0.2,

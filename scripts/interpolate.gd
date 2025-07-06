@@ -13,10 +13,9 @@ func _ready():
 
 func _process(_delta):
 	var f = Engine.get_physics_interpolation_fraction()
-	print(Engine.get_physics_interpolation_fraction())
 	set_global_position(m_Pos_prev.lerp(m_Pos_curr, f))
 
 
 func _physics_process(_delta):
 	m_Pos_prev = m_Pos_curr
-	m_Pos_curr = parent.get_global_position()	
+	m_Pos_curr = parent.get_global_position()
