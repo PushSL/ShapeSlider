@@ -5,7 +5,7 @@
 [ext_resource type="TileSet" uid="uid://6ctl3rrevivt" path="res://tiles/Tiles.tres" id="3_k2uud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0n1tn"]
-size = Vector2(1028, 512)
+size = Vector2(96, 96)
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_0n1tn")
@@ -18,7 +18,7 @@ z_index = 5
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
-position = Vector2(514, 256)
+position = Vector2(0, 48)
 shape = SubResource("RectangleShape2D_0n1tn")
 
 [node name="Control" type="Control" parent="Ground"]

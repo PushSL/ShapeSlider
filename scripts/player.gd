@@ -1,5 +1,5 @@
 extends CharacterBody2D
-const JUMP_VELOCITY = -1800
+const JUMP_VELOCITY = -1850
 var alive: bool = true
 
 
@@ -34,8 +34,10 @@ func kill(time = 0.75, start_delay = 0.25):
 		position = Vector2(48, -48)
 		velocity = Vector2.ZERO
 		$Sprite/Camera2D.position_smoothing_enabled = false
+		$Sprite/Camera2D.drag_vertical_enabled = false
 		await get_tree().create_timer(0).timeout
 		$Sprite/Camera2D.position_smoothing_enabled = true
+		$Sprite/Camera2D.drag_vertical_enabled = true
 		await get_tree().create_timer(start_delay).timeout
 		$CollisionShape2D.disabled = false
 		$/root/Level/Song.play()
