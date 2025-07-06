@@ -2,7 +2,7 @@
 
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
-[ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/Cubes/player_73-uhd.png" id="4_krlm5"]
+[ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/cubes/player_73-uhd.png" id="4_krlm5"]
 [ext_resource type="Texture2D" uid="uid://gy0cxdrsgna3" path="res://textures/Reshade Logo.png" id="4_p0lug"]
 [ext_resource type="AudioStream" uid="uid://k3rs6ci4ww7x" path="res://sounds/start_level.ogg" id="5_vymbj"]
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
