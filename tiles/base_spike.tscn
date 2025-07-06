@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://bel7exw0tugrw"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rofvc"]
+size = Vector2(30, 58)
+
+[node name="Spike" type="Area2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 11)
+shape = SubResource("RectangleShape2D_rofvc")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

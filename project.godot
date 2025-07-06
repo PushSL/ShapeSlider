@@ -368,7 +368,7 @@ reset={
 
 [physics]
 
-2d/default_gravity=9000.0
+2d/default_gravity=8750.0
 
 [rendering]
 
