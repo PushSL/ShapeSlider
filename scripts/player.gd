@@ -60,7 +60,7 @@ func ship(delta: float) -> void:
 	if velocity.y < -750:
 			velocity.y = -750
 
-func kill(time = 0.75, start_delay = 0.25):
+func kill(time = 0.5, start_delay = 0.1):
 	if alive:
 		alive = false
 		$CollisionShape2D.disabled = true
@@ -69,7 +69,7 @@ func kill(time = 0.75, start_delay = 0.25):
 			$Explode.play()
 			await get_tree().create_timer(time).timeout
 		$Sprite.rotation_degrees = 0
-		position = Vector2(48, -48)
+		position = Vector2(0, 0)
 		velocity = Vector2.ZERO
 		$Sprite/Camera2D.position_smoothing_enabled = false
 		$Sprite/Camera2D.drag_vertical_enabled = false
