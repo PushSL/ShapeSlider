@@ -18,7 +18,7 @@ var secondary_color: Color
 var glow_color: Color
 var current_level: int = 0
 var levels: int = 2
-var level_path: Array = [\"res://levels/0.tres\"]
+var level_path: Array = [\"res://levels/0.tres\", \"res://levels/1.tres\"]
 var data = ConfigFile.new()
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -72,17 +72,16 @@ func _process(_delta: float) -> void:
 				current_level += 1
 			if Input.is_action_just_pressed(\"jump\") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 				_on_start_pressed()
+			$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
 			match current_level:
 				0:
 					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
 					$\"Level Selector/Start/Description/Moon\".position = Vector2(297, -6)
-					$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
 					$\"Level Selector\".texture = load(\"res://levels/themes/Mono Saneness.tres\")
 					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Mono Saneness Dark.tres\")
 				1:
 					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/2 (2  )\"
 					$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
-					$\"Level Selector/Start\".text = \"Front Off Track\"
 					$\"Level Selector\".texture = load(\"res://levels/themes/Front Off Track.tres\")
 					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Front Off Track Dark.tres\")
 	if Input.is_action_just_pressed(\"exit\"):
@@ -159,7 +158,7 @@ func _on_start_pressed() -> void:
 		await $\"Level Selector/AudioStreamPlayer\".finished
 		$/root.add_child(preload(\"res://scenes/base_level.tscn\").instantiate())
 		$/root/Level.level = load(level_path[current_level])
-		$/root/Level.load_objects()
+		$/root/Level.load_data()
 		$/root/Level.add_child(preload(\"res://scenes/player.tscn\").instantiate())
 		visible = false
 		$/root/Level/Player/Sprite/Primary.modulate = primary_color

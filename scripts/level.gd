@@ -2,12 +2,17 @@ extends Node2D
 @export var level: Resource
 var ground_color: Color = Color8(0, 255, 102, 255)
 #For level_data it goes object(int), position.x(float), position.y(float), layer(int)
-func load_objects() -> void:
+func load_data() -> void:
+	$Song.stream = load(level.song_path)
+	print($"Song".stream)
+	$Song.play()
 	for object in level.object_data:
 		var object_path
 		match int(object.x):
 			1:
 				object_path = load("res://tiles/block_0.tscn").instantiate()
+			2:
+				object_path = load("res://tiles/spike_0.tscn").instantiate()
 			_:
 				object_path  = load("res://tiles/base_block.tscn").instantiate()
 		match int(object.w):
