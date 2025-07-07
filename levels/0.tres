@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="level_data" load_steps=2 format=3 uid="uid://dyvm226i8ivm4"]
+
+[ext_resource type="Script" uid="uid://dbbfm35lrqmux" path="res://levels/base_level_data.gd" id="1_jkiy7"]
+
+[resource]
+script = ExtResource("1_jkiy7")
+easy_best = 0
+hard_best = 0
+level_name = "Mono Saneness"
+level_id = 0
+object_data = []
+song_path = "res://sounds/StereoMadness.mp3"
+metadata/_custom_type_script = "uid://dbbfm35lrqmux"

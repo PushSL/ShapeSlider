@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://gy0cxdrsgna3" path="res://textures/Reshade Logo.png" id="4_p0lug"]
 [ext_resource type="AudioStream" uid="uid://k3rs6ci4ww7x" path="res://sounds/start_level.ogg" id="5_vymbj"]
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
-[ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/Mono Saneness Dark.tres" id="8_0s0e1"]
+[ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/themes/Mono Saneness Dark.tres" id="8_0s0e1"]
 
 [sub_resource type="GDScript" id="GDScript_wakvg"]
 resource_name = "Menu"
@@ -18,9 +18,7 @@ var secondary_color: Color
 var glow_color: Color
 var current_level: int = 0
 var levels: int = 2
-var level_hard_best: Array = range(levels)
-var level_easy_best: Array = range(levels)
-var level_data = [\"Mono Saneness\", 1]
+var level_path: Array = [\"res://levels/0.tres\", \"res://levels/1.tres\"]
 var data = ConfigFile.new()
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -40,10 +38,10 @@ func _ready() -> void:
 
 
 func save_data(option: String = \"all\"):
-	if option == \"all\" or \"level_best\":
-		for level in levels:
-			data.set_value(\"easy_best\", str(level), level_easy_best[level])
-			data.set_value(\"hard_best\", str(level), level_hard_best[level])
+	#if option == \"all\" or \"level_best\":
+		#for level in levels:
+			#data.set_value(\"easy_best\", str(level), level_easy_best[level])
+			#data.set_value(\"hard_best\", str(level), level_hard_best[level])
 	if option == \"all\" or \"player_color\":
 			data.set_value(\"player_color\", \"primary\", primary_color)
 			data.set_value(\"player_color\", \"secondary\", secondary_color)
@@ -51,10 +49,10 @@ func save_data(option: String = \"all\"):
 	data.save(\"user://data.cfg\")
 
 func load_data(option: String = \"all\"):
-	if option == \"all\" or \"level_best\":
-		for level in levels:
-			level_easy_best[level] = data.get_value(\"easy_best\", str(level), 0)
-			level_hard_best[level] = data.get_value(\"hard_best\", str(level), 0)
+	#if option == \"all\" or \"level_best\":
+		#for level in levels:
+			#level_easy_best[level] = data.get_value(\"easy_best\", str(level), 0)
+			#level_hard_best[level] = data.get_value(\"hard_best\", str(level), 0)
 	if option == \"all\" or \"player_color\":
 			primary_color = data.get_value(\"player_color\", \"primary\", Color(1, 1, 1, 1))
 			secondary_color = data.get_value(\"player_color\", \"secondary\", Color(0, 1, 1, 1 ))
@@ -66,27 +64,26 @@ func _process(_delta: float) -> void:
 		\"color_selector\":
 			pass
 		\"level_selector\":
-			$\"Level Selector/Easy Mode Best\".value = level_easy_best[current_level]
-			$\"Level Selector/Hard Mode Best\".value = level_hard_best[current_level]
+			$\"Level Selector/Easy Mode Best\".value = load(level_path[current_level]).easy_best
+			$\"Level Selector/Hard Mode Best\".value = load(level_path[current_level]).hard_best
 			if Input.is_action_just_pressed(\"left\") and current_level != 0:
 				current_level -= 1
 			if Input.is_action_just_pressed(\"right\") and current_level != levels - 1:
 				current_level += 1
 			if Input.is_action_just_pressed(\"jump\") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 				_on_start_pressed()
+			$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
 			match current_level:
 				0:
 					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
 					$\"Level Selector/Start/Description/Moon\".position = Vector2(297, -6)
-					$\"Level Selector/Start\".text = \"Mono Saneness\"
-					$\"Level Selector\".texture = load(\"res://levels/Mono Saneness.tres\")
-					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Mono Saneness Dark.tres\")
+					$\"Level Selector\".texture = load(\"res://levels/themes/Mono Saneness.tres\")
+					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Mono Saneness Dark.tres\")
 				1:
 					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/2 (2  )\"
 					$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
-					$\"Level Selector/Start\".text = \"Front Off Track\"
-					$\"Level Selector\".texture = load(\"res://levels/Front Off Track.tres\")
-					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/Front Off Track Dark.tres\")
+					$\"Level Selector\".texture = load(\"res://levels/themes/Front Off Track.tres\")
+					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Front Off Track Dark.tres\")
 	if Input.is_action_just_pressed(\"exit\"):
 		match scene:
 			\"main_menu\":
@@ -160,8 +157,11 @@ func _on_start_pressed() -> void:
 		$\"Level Selector/AudioStreamPlayer\".play()
 		await $\"Level Selector/AudioStreamPlayer\".finished
 		$/root.add_child(preload(\"res://scenes/base_level.tscn\").instantiate())
+		$/root/Level.level = load(level_path[current_level])
+		$/root/Level.load_data()
 		$/root/Level.add_child(preload(\"res://scenes/player.tscn\").instantiate())
 		visible = false
+		$/root/Level/Player/Sprite/Primary.modulate = primary_color
 		$/root/Level/Player/Sprite/Secondary.modulate = secondary_color
 		$/root/Level/Player/Sprite/Glow.modulate = glow_color
 		scene = \"gameplay\"
