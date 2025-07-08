@@ -59,31 +59,19 @@ func load_data(option: String = \"all\"):
 			glow_color = data.get_value(\"player_color\", \"glow\", Color(0, 1, 1, 1))
 
 func _process(_delta: float) -> void:
-	update_debugger()
+	#update_debugger()
 	match scene:
 		\"color_selector\":
 			pass
 		\"level_selector\":
-			$\"Level Selector/Easy Mode Best\".value = load(level_path[current_level]).easy_best
-			$\"Level Selector/Hard Mode Best\".value = load(level_path[current_level]).hard_best
 			if Input.is_action_just_pressed(\"left\") and current_level != 0:
 				current_level -= 1
+				update_level_page()
 			if Input.is_action_just_pressed(\"right\") and current_level != levels - 1:
 				current_level += 1
+				update_level_page()
 			if Input.is_action_just_pressed(\"jump\") and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 				_on_start_pressed()
-			$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
-			match current_level:
-				0:
-					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
-					$\"Level Selector/Start/Description/Moon\".position = Vector2(297, -6)
-					$\"Level Selector\".texture = load(\"res://levels/themes/Mono Saneness.tres\")
-					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Mono Saneness Dark.tres\")
-				1:
-					$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/2 (2  )\"
-					$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
-					$\"Level Selector\".texture = load(\"res://levels/themes/Front Off Track.tres\")
-					$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Front Off Track Dark.tres\")
 	if Input.is_action_just_pressed(\"exit\"):
 		match scene:
 			\"main_menu\":
@@ -104,13 +92,29 @@ func _process(_delta: float) -> void:
 				pass
 
 func update_debugger():
-	$\"../Debugger\".text = \"FPS: \" + str(fps)
+	$\"../Debugger\".text = \"FPS: \" + str(Engine.get_frames_per_second())
 	if scene == \"gameplay\":
-		$\"../Debugger\".text += \"\\nPosition: \" + str($/root/Level/Player.position) + \"
+		$\"../Debugger\".text += \"\\nPosition: \" + str(round($/root/Level/Player.position.x)) + \", \" + str(round($/root/Level/Player.position.y)) + \"
 		Velocity: \" + str($/root/Level/Player.velocity)
-	fps += 1
-	await get_tree().create_timer(1).timeout
-	fps -= 1
+
+func update_level_page():
+	$\"Level Selector/Easy Mode Best\".value = load(level_path[current_level]).easy_best
+	$\"Level Selector/Hard Mode Best\".value = load(level_path[current_level]).hard_best
+	$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
+	match current_level:
+		0:
+			$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
+			$\"Level Selector/Start/Description/Moon\".position = Vector2(297, -6)
+			$\"Level Selector\".texture = load(\"res://levels/themes/Mono Saneness.tres\")
+			$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Mono Saneness Dark.tres\")
+		1:
+			$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/2 (2  )\"
+			$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
+			$\"Level Selector\".texture = load(\"res://levels/themes/Front Off Track.tres\")
+			$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Front Off Track Dark.tres\")
+
+
+
 
 func _on_icons_pressed() -> void:
 	if scene == \"main_menu\":
@@ -122,6 +126,7 @@ func _on_play_pressed() -> void:
 		$AnimationPlayer.queue(\"level_selector_appear\")
 		scene = \"level_selector\"
 		current_level = 0
+		update_level_page()
 
 
 func _on_color_selector_pressed() -> void:
@@ -2370,6 +2375,7 @@ region_enabled = true
 region_rect = Rect2(1, 1, 130, 130)
 
 [node name="Editor Menu" type="PanelContainer" parent="UI/Menu"]
+visible = false
 z_index = 1
 layout_mode = 1
 anchors_preset = 8

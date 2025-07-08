@@ -1,21 +1,19 @@
 extends Node2D
 @export var level: Resource
 var ground_color: Color = Color8(0, 255, 102, 255)
-#For level_data it goes object(int), position.x(float), position.y(float), layer(int)
 func load_data() -> void:
 	$Song.stream = load(level.song_path)
-	print($"Song".stream)
 	$Song.play()
 	for object in level.object_data:
 		var object_path
-		match int(object.x):
+		match object[0]:
 			1:
 				object_path = load("res://tiles/block_0.tscn").instantiate()
 			2:
 				object_path = load("res://tiles/spike_0.tscn").instantiate()
 			_:
 				object_path  = load("res://tiles/base_block.tscn").instantiate()
-		match int(object.w):
+		match object[3]:
 			4:
 				$T4.add_child(object_path)
 			3:
@@ -34,7 +32,7 @@ func load_data() -> void:
 				$B4.add_child(object_path)
 			_:
 				add_child(object_path)
-		object_path.position = Vector2(object.y, object.z)
+		object_path.position = Vector2(object[1] * 9.6, object[2] * 9.6)
 
 func _process(_delta: float) -> void:
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700

@@ -10,7 +10,6 @@ func _physics_process(delta: float) -> void:
 		match gamemode:
 			"cube": cube(delta)
 			"ship": ship(delta)
-
 		position.x += 975 * delta
 		move_and_slide()
 	
@@ -20,7 +19,7 @@ func cube(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		$Sprite.rotate(6.5 * delta)
+		$Sprite.rotate(6.75 * delta)
 	else:
 		$Sprite.rotation_degrees = ($Sprite.rotation_degrees + round($Sprite.rotation_degrees / 90) * 90) / 2
 		
