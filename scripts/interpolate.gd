@@ -1,6 +1,6 @@
 extends Node2D
 
-var m_Pos_prev : = Vector2(0,0)
+var m_Pos_prev: = Vector2(0,0)
 var m_Pos_curr: = Vector2(0,0)
 var parent: Node2D
 
