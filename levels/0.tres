@@ -8,6 +8,6 @@ easy_best = 0
 hard_best = 0
 level_name = "Mono Saneness"
 level_id = 0
-object_data = []
+object_data = [[2, Vector2(50, 0), 0], [2, Vector2(60, 0), 0], [2, Vector2(70, 0), 0]]
 song_path = "res://sounds/StereoMadness.mp3"
 metadata/_custom_type_script = "uid://dbbfm35lrqmux"

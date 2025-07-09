@@ -10,6 +10,8 @@ func _physics_process(delta: float) -> void:
 		match gamemode:
 			"cube": cube(delta)
 			"ship": ship(delta)
+			"ufo": ufo(delta)
+
 		position.x += 975 * delta
 		move_and_slide()
 	
@@ -30,12 +32,10 @@ func cube(delta: float) -> void:
 			velocity.y = 5000
 		
 func ship(delta: float) -> void:
-	
 	if is_on_wall():
 		kill()
-		
 	if is_on_floor() or is_on_ceiling():
-		velocity.y /= 2 * delta
+		#velocity.y /= 2 * delta
 		$Sprite.rotation_degrees = ($Sprite.rotation_degrees + round($Sprite.rotation_degrees / 90) * 90) / 18
 	
 	if Input.is_action_pressed("jump"):
@@ -58,6 +58,18 @@ func ship(delta: float) -> void:
 	
 	if velocity.y < -750:
 			velocity.y = -750
+			
+func ufo(delta: float) -> void:
+	if is_on_wall():
+		kill()
+		
+	velocity.y += 50
+
+	if Input.is_action_just_pressed("jump"):
+		velocity.y = -1000
+		
+	if velocity.y > 900:
+			velocity.y = 900
 
 func kill(time = 0.5, start_delay = 0.1):
 	if alive:

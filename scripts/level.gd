@@ -13,7 +13,7 @@ func load_data() -> void:
 				object_path = load("res://tiles/spike_0.tscn").instantiate()
 			_:
 				object_path  = load("res://tiles/base_block.tscn").instantiate()
-		match object[3]:
+		match object[2]:
 			4:
 				$T4.add_child(object_path)
 			3:
@@ -32,7 +32,7 @@ func load_data() -> void:
 				$B4.add_child(object_path)
 			_:
 				add_child(object_path)
-		object_path.position = Vector2(object[1] * 9.6, object[2] * 9.6)
+		object_path.position = Vector2(object[1].x * 9.6, object[1].y * 9.6)
 
 func _process(_delta: float) -> void:
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700

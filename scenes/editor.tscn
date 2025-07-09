@@ -1,3 +1,50 @@
-[gd_scene format=3 uid="uid://i3q05eclebby"]
+[gd_scene load_steps=3 format=3 uid="uid://i3q05eclebby"]
 
-[node name="Editor" type="Node2D"]
+[ext_resource type="Script" uid="uid://ctuw2r03l060i" path="res://scripts/editor.gd" id="1_b1cmn"]
+[ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="1_pxqd5"]
+
+[node name="Editor" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_pxqd5")
+script = ExtResource("1_b1cmn")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -108.0
+offset_top = -96.0
+offset_right = 108.0
+offset_bottom = 96.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="PanelContainer"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "aaasdawd
+"
+
+[node name="Button2" type="Button" parent="PanelContainer"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+text = "eeeee
+"
+
+[node name="Button3" type="Button" parent="PanelContainer"]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+text = "eeee
+"
