@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://i3q05eclebby"]
+[gd_scene load_steps=4 format=3 uid="uid://i3q05eclebby"]
 
 [ext_resource type="Script" uid="uid://ctuw2r03l060i" path="res://scripts/editor.gd" id="1_b1cmn"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="1_pxqd5"]
+[ext_resource type="Texture2D" uid="uid://dcoxpapqu7a4e" path="res://textures/ground-1.png" id="3_ba0ut"]
 
 [node name="Editor" type="Control"]
 layout_mode = 3
@@ -15,36 +16,70 @@ grow_vertical = 2
 theme = ExtResource("1_pxqd5")
 script = ExtResource("1_b1cmn")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="Camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+
+[node name="Start Line" type="Line2D" parent="."]
+points = PackedVector2Array(0, -4000, 0, 1080)
+width = 1.0
+
+[node name="Ground" type="StaticBody2D" parent="."]
+z_index = 5
+position = Vector2(0, 48)
+collision_mask = 0
+metadata/_edit_lock_ = true
+
+[node name="Control" type="Control" parent="Ground"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="Ground/Control"]
+modulate = Color(0, 0.4, 1, 1)
+layout_mode = 0
+offset_left = -100000.0
+offset_right = 100000.0
+offset_bottom = 512.0
+texture = ExtResource("3_ba0ut")
+stretch_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect" type="ColorRect" parent="Ground/Control"]
+z_index = -1
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -108.0
-offset_top = -96.0
-offset_right = 108.0
-offset_bottom = 96.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = -1
+anchor_left = -2573.65
+anchor_right = 3483.25
+anchor_bottom = 2536.9
+offset_left = -1154.0
+offset_top = 9.0
+offset_right = 1700.0
+offset_bottom = 1089.0
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
 
-[node name="Button" type="Button" parent="PanelContainer"]
-custom_minimum_size = Vector2(124, 124)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "aaasdawd
-"
+[node name="T4" type="Node2D" parent="."]
+z_index = 4
 
-[node name="Button2" type="Button" parent="PanelContainer"]
-custom_minimum_size = Vector2(124, 124)
-layout_mode = 2
-text = "eeeee
-"
+[node name="T3" type="Node2D" parent="."]
+z_index = 3
 
-[node name="Button3" type="Button" parent="PanelContainer"]
-custom_minimum_size = Vector2(124, 124)
-layout_mode = 2
-text = "eeee
-"
+[node name="T2" type="Node2D" parent="."]
+z_index = 2
+
+[node name="T1" type="Node2D" parent="."]
+z_index = 1
+
+[node name="B1" type="Node2D" parent="."]
+z_index = -1
+
+[node name="B2" type="Node2D" parent="."]
+z_index = -2
+
+[node name="B3" type="Node2D" parent="."]
+z_index = -3
+
+[node name="B4" type="Node2D" parent="."]
+z_index = -4

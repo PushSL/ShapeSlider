@@ -19,13 +19,9 @@ var glow_color: Color
 var current_level: int = 0
 var levels: int = 2
 var level_path: Array = [\"res://levels/0.tres\", \"res://levels/1.tres\"]
-<<<<<<< HEAD
 var data: ConfigFile = ConfigFile.new()
 # Called when the node enters the scene tree for the first time.
-=======
-var data = ConfigFile.new()
 
->>>>>>> 8406f015ce62e14fde45f66e7a173af9e9e3a74e
 func _ready() -> void:
 	load_data()
 	$\"Main Menu\".visible = true
@@ -43,10 +39,6 @@ func _ready() -> void:
 
 
 func save_data(option: String = \"all\"):
-	#if option == \"all\" or \"level_best\":
-		#for level in levels:
-			#data.set_value(\"easy_best\", str(level), level_easy_best[level])
-			#data.set_value(\"hard_best\", str(level), level_hard_best[level])
 	if option == \"all\" or \"player_color\":
 			data.set_value(\"player_color\", \"primary\", primary_color)
 			data.set_value(\"player_color\", \"secondary\", secondary_color)
@@ -54,10 +46,6 @@ func save_data(option: String = \"all\"):
 	data.save(\"user://data.cfg\")
 
 func load_data(option: String = \"all\"):
-	#if option == \"all\" or \"level_best\":
-		#for level in levels:
-			#level_easy_best[level] = data.get_value(\"easy_best\", str(level), 0)
-			#level_hard_best[level] = data.get_value(\"hard_best\", str(level), 0)
 	if option == \"all\" or \"player_color\":
 			primary_color = data.get_value(\"player_color\", \"primary\", Color(1, 1, 1, 1))
 			secondary_color = data.get_value(\"player_color\", \"secondary\", Color(0, 1, 1, 1 ))
@@ -117,9 +105,6 @@ func update_level_page():
 			$\"Level Selector/Start/Description/Moon\".position = Vector2(262, -6)
 			$\"Level Selector\".texture = load(\"res://levels/themes/Front Off Track.tres\")
 			$\"Level Selector/Start/TextureRect\".texture = load(\"res://levels/themes/Front Off Track Dark.tres\")
-
-
-
 
 func _on_icons_pressed() -> void:
 	if scene == \"main_menu\":

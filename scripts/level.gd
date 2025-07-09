@@ -1,5 +1,5 @@
 extends Node2D
-@export var level: Resource
+var level: level_data
 var ground_color: Color = Color8(0, 255, 102, 255)
 
 func load_data() -> void:
@@ -33,7 +33,7 @@ func load_data() -> void:
 				$B4.add_child(object_path)
 			_:
 				add_child(object_path)
-		object_path.position = Vector2(object[1].x * 9.6, object[1].y * 9.6)
+		object_path.position = object[1] * 9.6
 
 func _process(_delta: float) -> void:
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700

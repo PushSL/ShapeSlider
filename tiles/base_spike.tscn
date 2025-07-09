@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://bel7exw0tugrw"]
+[gd_scene load_steps=3 format=3 uid="uid://bel7exw0tugrw"]
+
+[ext_resource type="Script" uid="uid://do55a2e8d3hde" path="res://scripts/spike_culler.gd" id="1_wme53"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rofvc"]
 size = Vector2(30, 58)
@@ -11,3 +13,7 @@ position = Vector2(0, 11)
 shape = SubResource("RectangleShape2D_rofvc")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-64, -64, 128, 128)
+script = ExtResource("1_wme53")

@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://cktlw5sjtvexc"]
+[gd_scene load_steps=3 format=3 uid="uid://cktlw5sjtvexc"]
+
+[ext_resource type="Script" uid="uid://df0a3sjgwapd2" path="res://scripts/tile_culler.gd" id="1_klj5d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ts0at"]
 size = Vector2(128, 128)
@@ -11,3 +13,7 @@ z_index = 10
 shape = SubResource("RectangleShape2D_ts0at")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-64, -64, 128, 128)
+script = ExtResource("1_klj5d")
