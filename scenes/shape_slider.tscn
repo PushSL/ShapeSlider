@@ -19,8 +19,13 @@ var glow_color: Color
 var current_level: int = 0
 var levels: int = 2
 var level_path: Array = [\"res://levels/0.tres\", \"res://levels/1.tres\"]
+<<<<<<< HEAD
 var data: ConfigFile = ConfigFile.new()
 # Called when the node enters the scene tree for the first time.
+=======
+var data = ConfigFile.new()
+
+>>>>>>> 8406f015ce62e14fde45f66e7a173af9e9e3a74e
 func _ready() -> void:
 	load_data()
 	$\"Main Menu\".visible = true
@@ -59,7 +64,7 @@ func load_data(option: String = \"all\"):
 			glow_color = data.get_value(\"player_color\", \"glow\", Color(0, 1, 1, 1))
 
 func _process(_delta: float) -> void:
-	#update_debugger()
+	update_debugger()
 	match scene:
 		\"color_selector\":
 			pass
@@ -175,8 +180,12 @@ func _on_start_pressed() -> void:
 
 func _on_editor_pressed() -> void:
 	if scene == \"main_menu\":
-		scene = \"editor_menu\"
-		$AnimationPlayer.queue(\"editor_menu_appear\")
+		scene = \"editor\"
+		$/root.add_child(load(\"res://scenes/editor.tscn\").instantiate())
+		get_tree().create_tween().tween_property($/root/Editor,\"modulate:a\",1,0.5).set_trans(Tween.TRANS_CUBIC)
+		get_tree().create_tween().tween_property(self,\"modulate:a\",0,0.5).set_trans(Tween.TRANS_CUBIC)
+		await get_tree().create_timer(0.5).timeout
+		hide()
 "
 
 [sub_resource type="Theme" id="Theme_m4023"]
