@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://do55a2e8d3hde" path="res://scripts/spike_culler.gd" id="1_wme53"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rofvc"]
-size = Vector2(30, 58)
+size = Vector2(26.6667, 51.3333)
 
 [node name="Spike" type="Area2D"]
 scale = Vector2(0.75, 0.75)

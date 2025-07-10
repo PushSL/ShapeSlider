@@ -14,7 +14,6 @@ func _process(delta: float) -> void:
 		place_tile(2, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
 		save()
 	
-	
 	if Input.is_action_just_pressed("move"):
 		move = $Camera.position - get_local_mouse_position()
 	

@@ -1,10 +1,12 @@
 extends Node2D
 var level: level_data
+var loaded_object: Array
 var ground_color: Color = Color8(0, 255, 102, 255)
 
 func load_data() -> void:
 	$Song.stream = load(level.song_path)
 	$Song.play()
+	clear_level()
 	for object in level.object_data:
 		var object_path: Node
 		match object[0]:
@@ -34,8 +36,20 @@ func load_data() -> void:
 			_:
 				add_child(object_path)
 		object_path.position = object[1] * 9.6
+		loaded_object.insert(loaded_object.size(), object_path)
 
-func _process(_delta: float) -> void:
+func clear_level():
+	loaded_object.clear()
+	for layer in [$T4, $T3, $T2, $T1, $B1, $B2, $B3, $B4]:
+		for n in layer.get_children():
+			layer.remove_child(n)
+			n.queue_free() 
+
+
+func _physics_process(_delta: float) -> void:
+	if $Player.alive:
+		for object in loaded_object:
+			pass
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700
 	$Ground/CollisionShape2D.position.x = $Player.position.x
 	$Ground/Control/TextureRect.size.x = $Player.global_position.x + DisplayServer.window_get_size().x + 1000

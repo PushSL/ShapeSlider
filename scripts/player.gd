@@ -12,7 +12,7 @@ func _physics_process(delta: float) -> void:
 			"ship": ship(delta)
 			"ufo": ufo(delta)
 
-		position.x += 975 * delta
+		position.x += 4
 		move_and_slide()
 	
 func cube(delta: float) -> void:
@@ -59,7 +59,7 @@ func ship(delta: float) -> void:
 	if velocity.y < -750:
 			velocity.y = -750
 			
-func ufo(delta: float) -> void:
+func ufo(_delta: float) -> void:
 	if is_on_wall():
 		kill()
 		
@@ -79,6 +79,7 @@ func kill(time = 0.5, start_delay = 0.1):
 		if time != 0:
 			$Explode.play()
 			await get_tree().create_timer(time).timeout
+		$/root/Level.load_data()
 		$Sprite.rotation_degrees = 0
 		position = Vector2(0, 0)
 		velocity = Vector2.ZERO

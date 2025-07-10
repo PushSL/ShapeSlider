@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bapyf443teuy1" path="res://scripts/player.gd" id="1_onrkg"]
 [ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/cubes/player_73-uhd.png" id="2_i3pqv"]
 [ext_resource type="AudioStream" uid="uid://bp6yafhqyfej2" path="res://sounds/explode.ogg" id="2_tuyoq"]
-[ext_resource type="Script" uid="uid://ble1iywgxleei" path="res://scripts/interpolate.gd" id="3_qlg0r"]
 
 [sub_resource type="Shader" id="Shader_qlg0r"]
 code = "shader_type canvas_item;
@@ -18,6 +17,28 @@ void fragment() {
 shader = SubResource("Shader_qlg0r")
 shader_parameter/intensity = 1.0
 
+[sub_resource type="GDScript" id="GDScript_qhqgy"]
+script/source = "extends Node2D
+
+var m_Pos_prev: = Vector2(0,0)
+var m_Pos_curr: = Vector2(0,0)
+var parent: Node2D
+
+func _ready():
+	parent = get_parent()
+	m_Pos_prev = parent.get_global_position()
+	m_Pos_curr = parent.get_global_position()
+	set_global_position(parent.get_global_position())
+
+func _process(_delta):
+	if Engine.get_frames_per_second() > Engine.physics_ticks_per_second:
+		set_global_position(m_Pos_prev.lerp(m_Pos_curr, Engine.get_physics_interpolation_fraction()))
+
+func _physics_process(_delta):
+	m_Pos_prev = m_Pos_curr
+	m_Pos_curr = parent.get_global_position()
+"
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_krlm5"]
 size = Vector2(95, 95)
 
@@ -31,7 +52,7 @@ stream = ExtResource("2_tuyoq")
 
 [node name="Sprite" type="Node2D" parent="."]
 material = SubResource("ShaderMaterial_qhqgy")
-script = ExtResource("3_qlg0r")
+script = SubResource("GDScript_qhqgy")
 
 [node name="Camera2D" type="Camera2D" parent="Sprite"]
 offset = Vector2(304, -187)
