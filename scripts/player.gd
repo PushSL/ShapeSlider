@@ -12,7 +12,7 @@ func _physics_process(delta: float) -> void:
 			"ship": ship(delta)
 			"ufo": ufo(delta)
 
-		position.x += 4
+		position.x += 4.25
 		move_and_slide()
 	
 func cube(delta: float) -> void:
@@ -75,10 +75,11 @@ func kill(time = 0.5, start_delay = 0.1):
 	if alive:
 		alive = false
 		$CollisionShape2D.disabled = true
-		$/root/Level/Song.stop()
+		$/root/Level/Song.playing = false
 		if time != 0:
 			$Explode.play()
 			await get_tree().create_timer(time).timeout
+		$/root/Level.clear_level()
 		$/root/Level.load_data()
 		$Sprite.rotation_degrees = 0
 		position = Vector2(0, 0)
@@ -90,7 +91,7 @@ func kill(time = 0.5, start_delay = 0.1):
 		$Sprite/Camera2D.drag_vertical_enabled = true
 		await get_tree().create_timer(start_delay).timeout
 		$CollisionShape2D.disabled = false
-		$/root/Level/Song.play()
+		$/root/Level/Song.playing = true
 		alive = true
 
 

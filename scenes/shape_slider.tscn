@@ -153,6 +153,8 @@ func _on_start_pressed() -> void:
 		await $\"Level Selector/AudioStreamPlayer\".finished
 		$/root.add_child(preload(\"res://scenes/base_level.tscn\").instantiate())
 		$/root/Level.level = load(level_path[current_level])
+		$/root/Level/Song.stream = load(load(level_path[current_level]).song_path)
+		$/root/Level/Song.play()
 		$/root/Level.load_data()
 		$/root/Level.add_child(preload(\"res://scenes/player.tscn\").instantiate())
 		visible = false

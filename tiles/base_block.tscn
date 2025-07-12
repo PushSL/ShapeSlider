@@ -13,7 +13,11 @@ z_index = 10
 shape = SubResource("RectangleShape2D_ts0at")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 rect = Rect2(-64, -64, 128, 128)
 script = ExtResource("1_klj5d")
+
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_exited"]
