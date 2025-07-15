@@ -54,6 +54,21 @@ theme = ExtResource("3_eqbpn")
 [node name="Spike" parent="UI/Bottom/GridContainer/Button2" instance=ExtResource("5_5tm2q")]
 position = Vector2(48, 48)
 
+[node name="Save" type="Button" parent="UI"]
+offset_left = 1715.0
+offset_right = 1913.0
+offset_bottom = 95.0
+theme = ExtResource("1_pxqd5")
+text = "Save"
+
+[node name="Load" type="Button" parent="UI"]
+offset_left = 1715.0
+offset_top = 98.0
+offset_right = 1913.0
+offset_bottom = 193.0
+theme = ExtResource("1_pxqd5")
+text = "Load"
+
 [node name="Start Line" type="Line2D" parent="."]
 position = Vector2(-48, 0)
 points = PackedVector2Array(0, -4000, 0, 1080)
@@ -125,3 +140,5 @@ z_index = -4
 
 [connection signal="pressed" from="UI/Bottom/GridContainer/Button" to="UI/Bottom/GridContainer" method="_on_button_pressed"]
 [connection signal="pressed" from="UI/Bottom/GridContainer/Button2" to="UI/Bottom/GridContainer" method="_on_button_2_pressed"]
+[connection signal="pressed" from="UI/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="UI/Load" to="." method="_on_load_pressed"]
