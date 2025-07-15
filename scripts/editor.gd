@@ -93,6 +93,7 @@ func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	for object in level.object_data:
 		if position == object[1]:
 			level.object_data.remove_at(level.object_data.find(object))
+			break
 	save()
 	
 
