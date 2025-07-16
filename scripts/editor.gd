@@ -5,29 +5,34 @@ extends Control
 var drag_start_camera_position: Vector2
 var drag_start_cursor_position: Vector2
 var selected_object: int = 1
+var block_input: bool = false
 
 func _ready() -> void:
 	load_data()
+	$UI/Menu/Label.text = level.level_name
 	modulate.a = 0
-	Engine.physics_ticks_per_second = 1	
+	Engine.physics_ticks_per_second = 1
 
 func _process(delta: float) -> void:
-	if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and Input.is_action_pressed("swipe"):
-		var place: bool = true
-		if level.object_data.size() != 0:
-			for object in level.object_data:
-				if object[1] == (((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6)) / 10).round() * 10 and object[0] == selected_object:
-					place = false
-		else:
-			place = true
-		if place == true:
-			place_tile(selected_object, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
+	if Input.is_action_just_pressed("exit"):
+		_on_menu_button_pressed()
+	if !block_input:
+		if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and Input.is_action_pressed("swipe"):
+			var place: bool = true
+			if level.object_data.size() != 0:
+				for object in level.object_data:
+					if object[1] == (((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6)) / 10).round() * 10 and object[0] == selected_object:
+						place = false
+			else:
+				place = true
+			if place == true:
+				place_tile(selected_object, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
 
-	if Input.is_action_pressed("right_click") and Input.is_action_pressed("swipe") or Input.is_action_just_released("right_click"):
-		delete_tile((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6))
-		
-	if not Input.is_action_pressed("swipe"):
-		camera()
+		if Input.is_action_pressed("right_click") and Input.is_action_pressed("swipe") or Input.is_action_just_released("right_click"):
+			delete_tile((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6))
+			
+		if not Input.is_action_pressed("swipe"):
+			camera()
 
 func save() -> void:
 	var data := level_data.new()
@@ -146,3 +151,23 @@ func _on_save_pressed() -> void:
 func _on_load_pressed() -> void:
 	clear_level()
 	load_data()
+
+
+func _on_mouse_entered() -> void:
+	block_input = true
+
+
+func _on_mouse_exited() -> void:
+	drag_start_cursor_position = get_viewport().get_mouse_position()
+	drag_start_camera_position = $Camera.position
+	block_input = false
+
+
+func _on_menu_button_pressed() -> void:
+	if $UI/Menu.visible:
+		$UI/Menu.visible = false
+		block_input = false
+	else:
+		$UI/Menu.visible = true
+		block_input = true
+	print(block_input)
