@@ -4,8 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://de2pkbtmgvox1" path="res://tiles/Spike.svg" id="2_gj21h"]
 
 [node name="Spike" instance=ExtResource("1_xs7ml")]
-collision_mask = 0
 monitoring = false
+
+[node name="kill" parent="." index="0"]
+z_index = 1
 
 [node name="Sprite2D" parent="." index="1"]
 texture = ExtResource("2_gj21h")

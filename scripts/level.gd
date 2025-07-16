@@ -1,6 +1,5 @@
 extends Node2D
 var level: level_data
-var loaded_object: Array
 var ground_color: Color = Color8(0, 255, 102, 255)
 
 func load_data() -> void:
@@ -32,24 +31,17 @@ func load_data() -> void:
 			_:
 				$T1.add_child(object[3])
 		object[3].position = object[1] * 9.6
-		loaded_object.insert(loaded_object.size(), object[3])
 
 func clear_level():
-	loaded_object.clear()
-	var threads: Array
 	for layer in [$T4, $T3, $T2, $T1, $B1, $B2, $B3, $B4]:
 		var thread: Thread = Thread.new()
 		thread.start(clear_layer.bind(layer.get_children()))
-		threads.insert(threads.size(), thread)
 
 func clear_layer(objects: Array):
 	for object in objects:
 		object.queue_free()
 
 func _physics_process(_delta: float) -> void:
-	if $Player.alive:
-		for object in loaded_object:
-			pass
 	$Ground/Control/ColorRect.position.x = $Player.position.x - 700
 	$Ground/CollisionShape2D.position.x = $Player.position.x
 	$Ground/Control/TextureRect.size.x = $Player.global_position.x + DisplayServer.window_get_size().x + 1000

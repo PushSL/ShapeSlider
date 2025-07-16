@@ -58,6 +58,8 @@ theme = ExtResource("3_eqbpn")
 
 [node name="Block" parent="UI/Bottom/GridContainer/Button" instance=ExtResource("4_5lcyj")]
 position = Vector2(48, 48)
+collision_layer = 1
+collision_mask = 1
 
 [node name="Button2" type="Button" parent="UI/Bottom/GridContainer"]
 custom_minimum_size = Vector2(96, 96)
@@ -66,6 +68,7 @@ theme = ExtResource("3_eqbpn")
 
 [node name="Spike" parent="UI/Bottom/GridContainer/Button2" instance=ExtResource("5_5tm2q")]
 position = Vector2(48, 48)
+collision_layer = 1
 
 [node name="Menu" type="PanelContainer" parent="UI"]
 visible = false
@@ -105,6 +108,10 @@ layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("1_pxqd5")
 text = "Load"
+
+[node name="Exit" type="Button" parent="UI/Menu/GridContainer"]
+layout_mode = 2
+text = "Exit"
 
 [node name="Start Line" type="Line2D" parent="."]
 position = Vector2(-48, 0)
@@ -184,3 +191,4 @@ z_index = -4
 [connection signal="pressed" from="UI/Bottom/GridContainer/Button2" to="UI/Bottom/GridContainer" method="_on_button_2_pressed"]
 [connection signal="pressed" from="UI/Menu/GridContainer/Save" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="UI/Menu/GridContainer/Load" to="." method="_on_load_pressed"]
+[connection signal="pressed" from="UI/Menu/GridContainer/Exit" to="." method="_on_exit_pressed"]

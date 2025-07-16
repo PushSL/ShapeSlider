@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ca7rvhkwva4jj"]
+[gd_scene load_steps=9 format=3 uid="uid://ca7rvhkwva4jj"]
 
 [ext_resource type="Script" uid="uid://bapyf443teuy1" path="res://scripts/player.gd" id="1_onrkg"]
 [ext_resource type="Texture2D" uid="uid://b3ny3ak5ebigb" path="res://icons/cubes/player_73-uhd.png" id="2_i3pqv"]
@@ -42,6 +42,9 @@ func _physics_process(_delta):
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_krlm5"]
 size = Vector2(95, 95)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qhqgy"]
+size = Vector2(32, 32)
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_onrkg")
 
@@ -83,12 +86,23 @@ texture = ExtResource("2_i3pqv")
 region_enabled = true
 region_rect = Rect2(1, 1, 130, 130)
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 3.14159
+shape = SubResource("RectangleShape2D_krlm5")
+
 [node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_krlm5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_krlm5")
+[node name="Deathbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Deathbox"]
+shape = SubResource("RectangleShape2D_qhqgy")
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
+[connection signal="body_shape_entered" from="Deathbox" to="." method="_on_deathbox_body_shape_entered"]

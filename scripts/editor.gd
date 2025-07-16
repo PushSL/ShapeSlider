@@ -2,6 +2,7 @@ extends Control
 @onready var level_path: Array = $/root/ShapeSlider/UI/Menu.level_path
 @onready var current_level: int = $/root/ShapeSlider/UI/Menu.current_level
 @onready var level: level_data = load(level_path[current_level])
+@onready var stored_level: level_data = level
 var drag_start_camera_position: Vector2
 var drag_start_cursor_position: Vector2
 var selected_object: int = 1
@@ -13,26 +14,28 @@ func _ready() -> void:
 	modulate.a = 0
 	Engine.physics_ticks_per_second = 1
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
 	if block_input == false:
 		if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and Input.is_action_pressed("swipe"):
 			var place: bool = true
 			if level.object_data.size() != 0:
+				var position: Vector2 = ((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6) / 10).round() * 10 
 				for object in level.object_data:
-					if object[1] == (((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6)) / 10).round() * 10 and object[0] == selected_object:
+					if object[1] == position and object[0] == selected_object:
 						place = false
+						break
 			else:
 				place = true
 			if place == true:
 				place_tile(selected_object, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
-
 		if Input.is_action_pressed("right_click") and Input.is_action_pressed("swipe") or Input.is_action_just_released("right_click"):
 			delete_tile((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6))
-			
 		if not Input.is_action_pressed("swipe"):
 			camera()
+		else:
+			drag_start_cursor_position = get_viewport().get_mouse_position()
 
 func save() -> void:
 	var data := level_data.new()
@@ -88,7 +91,6 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 		_:
 			$T1.add_child(object[3])
 	object[3].position = round(position / snap) * snap * 9.6
-	
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	position = (position / snap).round() * snap
@@ -113,8 +115,9 @@ func clear_layer(objects: Array):
 
 func load_data() -> void:
 	level = level_data.new()
-	level = load(level_path[current_level])
+	level = stored_level
 	for object in level.object_data:
+		#var neaw: int = Time.get_ticks_usec()
 		match object[0]:
 			1:
 				object[3] = preload("res://tiles/block_0.tscn").instantiate()
@@ -158,9 +161,10 @@ func _on_mouse_entered() -> void:
 
 
 func _on_mouse_exited() -> void:
-	drag_start_cursor_position = get_viewport().get_mouse_position()
-	drag_start_camera_position = $Camera.position
-	block_input = false
+	if not $UI/Menu.visible:
+		drag_start_cursor_position = get_viewport().get_mouse_position()
+		drag_start_camera_position = $Camera.position
+		block_input = false
 
 
 func _on_menu_button_pressed() -> void:
@@ -170,3 +174,11 @@ func _on_menu_button_pressed() -> void:
 	else:
 		$UI/Menu.visible = true
 		block_input = true
+
+
+func _on_exit_pressed() -> void:
+	queue_free()
+	Engine.physics_ticks_per_second = 240
+	$/root/ShapeSlider/UI/Menu.scene = "main_menu"
+	$/root/ShapeSlider/UI/Menu.visible = true
+	$/root/ShapeSlider/UI/Menu.modulate.a = 1

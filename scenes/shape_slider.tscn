@@ -91,9 +91,10 @@ func update_debugger():
 		Velocity: \" + str($/root/Level/Player.velocity)
 
 func update_level_page():
-	$\"Level Selector/Easy Mode Best\".value = load(level_path[current_level]).easy_best
-	$\"Level Selector/Hard Mode Best\".value = load(level_path[current_level]).hard_best
-	$\"Level Selector/Start\".text = load(level_path[current_level]).level_name
+	var level: level_data = load(level_path[current_level])
+	$\"Level Selector/Easy Mode Best\".value = level.easy_best
+	$\"Level Selector/Hard Mode Best\".value = level.hard_best
+	$\"Level Selector/Start\".text = level.level_name
 	match current_level:
 		0:
 			$\"Level Selector/Start/Description\".text = \"Difficulty: Ease/1.5 (1.5  )\"
@@ -172,7 +173,7 @@ func _on_editor_pressed() -> void:
 		get_tree().create_tween().tween_property($/root/Editor,\"modulate:a\",1,0.5).set_trans(Tween.TRANS_CUBIC)
 		get_tree().create_tween().tween_property(self,\"modulate:a\",0,0.5).set_trans(Tween.TRANS_CUBIC)
 		await get_tree().create_timer(0.5).timeout
-		hide()
+		visible = false
 "
 
 [sub_resource type="Theme" id="Theme_m4023"]

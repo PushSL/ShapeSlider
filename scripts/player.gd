@@ -2,6 +2,7 @@ extends CharacterBody2D
 const JUMP_VELOCITY: int = -1850
 var alive: bool = true
 var gamemode: String = "cube"
+var position_x: float = 0
 
 func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("reset"):
@@ -11,21 +12,21 @@ func _physics_process(delta: float) -> void:
 			"cube": cube(delta)
 			"ship": ship(delta)
 			"ufo": ufo(delta)
-
-		position.x += 4.25
+		
 		move_and_slide()
+		position_x += 4.25
+		position.x = position_x
 	
 func cube(delta: float) -> void:
-	if is_on_wall() or is_on_ceiling():
-		kill()
-
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		$Sprite.rotate(6.75 * delta)
-	else:
+	
+	if velocity.y == 0:
 		$Sprite.rotation_degrees = ($Sprite.rotation_degrees + round($Sprite.rotation_degrees / 90) * 90) / 2
-		
-	if Input.is_action_pressed("jump") and is_on_floor():
+	else:
+		$Sprite.rotate(7 * delta)
+	
+	if Input.is_action_pressed("jump") and velocity.y == 0:
 		velocity.y = JUMP_VELOCITY
 		
 	if velocity.y > 5000:
@@ -82,6 +83,7 @@ func kill(time = 0.5, start_delay = 0.1):
 		$/root/Level.clear_level()
 		$/root/Level.load_data()
 		$Sprite.rotation_degrees = 0
+		position_x = 0
 		position = Vector2(0, 0)
 		velocity = Vector2.ZERO
 		$Sprite/Camera2D.position_smoothing_enabled = false
@@ -98,3 +100,7 @@ func kill(time = 0.5, start_delay = 0.1):
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.get_child(0, false).name == "kill":
 		kill()
+
+
+func _on_deathbox_body_shape_entered(_body_rid: RID, _body: Node2D, _body_shape_index: int, _local_shape_index: int) -> void:
+	kill()
