@@ -2,7 +2,6 @@ extends Node2D
 var level: level_data
 var loaded_object: Array
 var ground_color: Color = Color8(0, 255, 102, 255)
-var thread: Thread
 
 func load_data() -> void:
 	for object in level.object_data:
