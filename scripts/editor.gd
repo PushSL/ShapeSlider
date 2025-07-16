@@ -16,7 +16,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
-	if !block_input:
+	if block_input == false:
 		if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and Input.is_action_pressed("swipe"):
 			var place: bool = true
 			if level.object_data.size() != 0:
@@ -170,4 +170,3 @@ func _on_menu_button_pressed() -> void:
 	else:
 		$UI/Menu.visible = true
 		block_input = true
-	print(block_input)
