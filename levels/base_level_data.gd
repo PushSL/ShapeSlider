@@ -4,5 +4,5 @@ class_name level_data
 @export var hard_best: int = 0
 @export var level_name: String = "Untitled Level"
 @export var level_id: int = 0
-@export var object_data: Array
+@export var object_data: Dictionary
 @export var song_path: String

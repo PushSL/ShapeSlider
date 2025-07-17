@@ -89,6 +89,7 @@ region_rect = Rect2(1, 1, 130, 130)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 3.14159
 shape = SubResource("RectangleShape2D_krlm5")
+debug_color = Color(1, 1, 0, 0.419608)
 
 [node name="Hitbox" type="Area2D" parent="."]
 collision_layer = 0
@@ -96,6 +97,7 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_krlm5")
+debug_color = Color(1, 0, 0, 0.419608)
 
 [node name="Deathbox" type="Area2D" parent="."]
 collision_layer = 0
@@ -103,6 +105,7 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Deathbox"]
 shape = SubResource("RectangleShape2D_qhqgy")
+debug_color = Color(0, 1, 0, 0.419608)
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
 [connection signal="body_shape_entered" from="Deathbox" to="." method="_on_deathbox_body_shape_entered"]

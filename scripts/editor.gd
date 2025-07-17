@@ -22,10 +22,8 @@ func _process(_delta: float) -> void:
 			var place: bool = true
 			if level.object_data.size() != 0:
 				var position: Vector2 = ((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6) / 10).round() * 10 
-				for object in level.object_data:
-					if object[1] == position and object[0] == selected_object:
-						place = false
-						break
+				if level.object_data.has(position) and level.object_data.get(position)[0] == selected_object:
+					place = false
 			else:
 				place = true
 			if place == true:
@@ -62,43 +60,42 @@ func camera():
 
 
 func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> void:
-	level.object_data.insert(level.object_data.size(),[type, round(position / snap) * snap,layer,null])
-	var object = level.object_data[level.object_data.size() - 1]
+	level.object_data[round(position / snap) * snap] = [type, layer, null]
+	var object = level.object_data[round(position / snap) * snap]
 	match type:
 		1:
-			object[3] = preload("res://tiles/block_0.tscn").instantiate()
+			object[2] = preload("res://tiles/block_0.tscn").instantiate()
 		2:
-			object[3] = preload("res://tiles/spike_0.tscn").instantiate()
+			object[2] = preload("res://tiles/spike_0.tscn").instantiate()
 		_:
-			object[3] = preload("res://tiles/base_block.tscn").instantiate()
+			object[2] = preload("res://tiles/base_block.tscn").instantiate()
 	match layer:
 		4:
-			$T4.add_child(object[3])
+			$T4.add_child(object[2])
 		3:
-			$T3.add_child(object[3])
+			$T3.add_child(object[2])
 		2:
-			$T2.add_child(object[3])
+			$T2.add_child(object[2])
 		1:
-			$T1.add_child(object[3])
+			$T1.add_child(object[2])
 		-1:
-			$B1.add_child(object[3])
+			$B1.add_child(object[2])
 		-2:
-			$B2.add_child(object[3])
+			$B2.add_child(object[2])
 		-3:
-			$B3.add_child(object[3])
+			$B3.add_child(object[2])
 		-4:
-			$B4.add_child(object[3])
+			$B4.add_child(object[2])
 		_:
-			$T1.add_child(object[3])
-	object[3].position = round(position / snap) * snap * 9.6
+			$T1.add_child(object[2])
+	object[2].position = round(position / snap) * snap * 9.6
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	position = (position / snap).round() * snap
-	for object in level.object_data:
-		if position == object[1]:
-			object[3].queue_free()
-			level.object_data.remove_at(level.object_data.find(object))
-			break
+	if level.object_data.has(position):
+		level.object_data.get(position)[2].queue_free()
+		level.object_data.erase(position)
+
 
 
 func clear_level():
@@ -117,34 +114,34 @@ func load_data() -> void:
 	level = level_data.new()
 	level = stored_level
 	for object in level.object_data:
-		#var neaw: int = Time.get_ticks_usec()
-		match object[0]:
+		var object_info = level.object_data.get(object)
+		match object_info[0]:
 			1:
-				object[3] = preload("res://tiles/block_0.tscn").instantiate()
+				object_info[2] = preload("res://tiles/block_0.tscn").instantiate()
 			2:
-				object[3] = preload("res://tiles/spike_0.tscn").instantiate()
+				object_info[2] = preload("res://tiles/spike_0.tscn").instantiate()
 			_:
-				object[3] = preload("res://tiles/base_block.tscn").instantiate()
-		match object[2]:
+				object_info[2] = preload("res://tiles/base_block.tscn").instantiate()
+		match object_info[1]:
 			4:
-				$T4.add_child(object[3])
+				$T4.add_child(object_info[2])
 			3:
-				$T3.add_child(object[3])
+				$T3.add_child(object_info[2])
 			2:
-				$T2.add_child(object[3])
+				$T2.add_child(object_info[2])
 			1:
-				$T1.add_child(object[3])
+				$T1.add_child(object_info[2])
 			-1:
-				$B1.add_child(object[3])
+				$B1.add_child(object_info[2])
 			-2:
-				$B2.add_child(object[3])
+				$B2.add_child(object_info[2])
 			-3:
-				$B3.add_child(object[3])
+				$B3.add_child(object_info[2])
 			-4:
-				$B4.add_child(object[3])
+				$B4.add_child(object_info[2])
 			_:
-				add_child(object[3])
-		object[3].position = object[1] * 9.6
+				$T1.add_child(object_info[2])
+		object_info[2].position = object * 9.6
 
 
 func _on_save_pressed() -> void:

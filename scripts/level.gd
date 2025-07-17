@@ -4,33 +4,34 @@ var ground_color: Color = Color8(0, 255, 102, 255)
 
 func load_data() -> void:
 	for object in level.object_data:
-		match object[0]:
+		var object_info = level.object_data.get(object)
+		match object_info[0]:
 			1:
-				object[3] = preload("res://tiles/block_0.tscn").instantiate()
+				object_info[2] = preload("res://tiles/block_0.tscn").instantiate()
 			2:
-				object[3] = preload("res://tiles/spike_0.tscn").instantiate()
+				object_info[2] = preload("res://tiles/spike_0.tscn").instantiate()
 			_:
-				object[3] = preload("res://tiles/base_block.tscn").instantiate()
-		match object[2]:
+				object_info[2] = preload("res://tiles/base_block.tscn").instantiate()
+		match object_info[2]:
 			4:
-				$T4.add_child(object[3])
+				$T4.add_child(object_info[2])
 			3:
-				$T3.add_child(object[3])
+				$T3.add_child(object_info[2])
 			2:
-				$T2.add_child(object[3])
+				$T2.add_child(object_info[2])
 			1:
-				$T1.add_child(object[3])
+				$T1.add_child(object_info[2])
 			-1:
-				$B1.add_child(object[3])
+				$B1.add_child(object_info[2])
 			-2:
-				$B2.add_child(object[3])
+				$B2.add_child(object_info[2])
 			-3:
-				$B3.add_child(object[3])
+				$B3.add_child(object_info[2])
 			-4:
-				$B4.add_child(object[3])
+				$B4.add_child(object_info[2])
 			_:
-				$T1.add_child(object[3])
-		object[3].position = object[1] * 9.6
+				$T1.add_child(object_info[2])
+		object_info[2].position = object * 9.6
 
 func clear_level():
 	for layer in [$T4, $T3, $T2, $T1, $B1, $B2, $B3, $B4]:

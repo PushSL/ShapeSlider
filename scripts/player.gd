@@ -5,17 +5,18 @@ var gamemode: String = "cube"
 var position_x: float = 0
 
 func _physics_process(delta: float) -> void:
-	if Input.is_action_just_pressed("reset"):
-		kill(0)
-	if alive:
-		match gamemode:
-			"cube": cube(delta)
-			"ship": ship(delta)
-			"ufo": ufo(delta)
-		
-		move_and_slide()
-		position_x += 4.25
-		position.x = position_x
+	if $"/root/ShapeSlider/UI/Pause Menu".visible == false:
+		if Input.is_action_just_pressed("reset"):
+			kill(0)
+		if alive:
+			match gamemode:
+				"cube": cube(delta)
+				"ship": ship(delta)
+				"ufo": ufo(delta)
+			
+			move_and_slide()
+			position_x += 4.275
+			position.x = position_x
 	
 func cube(delta: float) -> void:
 	if not is_on_floor():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://kmxvuqn0i1vg"]
+[gd_scene load_steps=25 format=3 uid="uid://kmxvuqn0i1vg"]
 
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="1_jqa43"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="3_chx57"]
@@ -7,6 +7,18 @@
 [ext_resource type="AudioStream" uid="uid://k3rs6ci4ww7x" path="res://sounds/start_level.ogg" id="5_vymbj"]
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
 [ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/themes/Mono Saneness Dark.tres" id="8_0s0e1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vymbj"]
+bg_color = Color(0, 0, 0, 0.658824)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 20
+anti_aliasing_size = 10.0
+
+[sub_resource type="Theme" id="Theme_jqa43"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_vymbj")
 
 [sub_resource type="GDScript" id="GDScript_wakvg"]
 resource_name = "Menu"
@@ -24,6 +36,8 @@ var data: ConfigFile = ConfigFile.new()
 
 func _ready() -> void:
 	load_data()
+	visible = true
+	$\"../Pause Menu\".visible = false
 	$\"Main Menu\".visible = true
 	$\"Icon Menu\".visible = false
 	$\"Color Menu\".visible = false
@@ -82,7 +96,11 @@ func _process(_delta: float) -> void:
 				$AnimationPlayer.queue(\"editor_menu_disappear\")
 				scene = \"main_menu\"
 			\"gameplay\":
-				pass
+				if $\"../Pause Menu\".visible:
+					_on_exit_pressed()
+				else:
+					$\"../Pause Menu\".visible = true
+					$/root/Level/Song.stream_paused = true
 
 func update_debugger():
 	$\"../Debugger\".text = \"FPS: \" + str(Engine.get_frames_per_second())
@@ -174,6 +192,20 @@ func _on_editor_pressed() -> void:
 		get_tree().create_tween().tween_property(self,\"modulate:a\",0,0.5).set_trans(Tween.TRANS_CUBIC)
 		await get_tree().create_timer(0.5).timeout
 		visible = false
+
+
+func _on_resume_pressed() -> void:
+	$\"../Pause Menu\".visible = false
+	$/root/Level/Song.stream_paused = false
+
+
+
+func _on_exit_pressed() -> void:
+	scene = \"level_selector\"
+	$\"../Pause Menu\".visible = false
+	visible = true
+	_on_play_pressed()
+	$/root/Level.queue_free()
 "
 
 [sub_resource type="Theme" id="Theme_m4023"]
@@ -628,7 +660,42 @@ metadata/_edit_lock_ = true
 
 [node name="UI" type="CanvasLayer" parent="."]
 
+[node name="Pause Menu" type="PanelContainer" parent="UI"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 171.0
+offset_top = 114.0
+offset_right = -171.0
+offset_bottom = -114.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_jqa43")
+
+[node name="Buttons" type="GridContainer" parent="UI/Pause Menu"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Resume" type="Button" parent="UI/Pause Menu/Buttons"]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+text = "Resume"
+
+[node name="Exit" type="Button" parent="UI/Pause Menu/Buttons"]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+text = "Exit"
+
 [node name="Menu" type="Control" parent="UI"]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -2422,6 +2489,8 @@ offset_right = 44.0
 offset_bottom = 27.0
 theme = ExtResource("3_chx57")
 
+[connection signal="pressed" from="UI/Pause Menu/Buttons/Resume" to="UI/Menu" method="_on_resume_pressed"]
+[connection signal="pressed" from="UI/Pause Menu/Buttons/Exit" to="UI/Menu" method="_on_exit_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Icons" to="UI/Menu" method="_on_icons_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Play" to="UI/Menu" method="_on_play_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Editor" to="UI/Menu" method="_on_editor_pressed"]
