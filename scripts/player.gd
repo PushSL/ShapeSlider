@@ -4,6 +4,16 @@ var alive: bool = true
 var gamemode: String = "cube"
 var position_x: float = 0
 
+func _process(delta: float) -> void:
+	var camera_rect = Rect2($Sprite/Camera2D.global_position + $Sprite/Camera2D.offset - get_viewport_rect().size / 2 / $Sprite/Camera2D.zoom, get_viewport_rect().size / $Sprite/Camera2D.zoom)
+	
+	for object in $/root/Level.level.object_data:
+		if object.loaded_object:
+			var object_position = object.loaded_object.global_position
+			var object_size = object.loaded_object.get_rect().size if object.loaded_object.has_method("get_rect") else Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)  # Fallback
+			var object_rect = Rect2(object_position - object_size / 2, object_size)
+			object.loaded_object.visible = camera_rect.intersects(object_rect)
+
 func _physics_process(delta: float) -> void:
 	if $"/root/ShapeSlider/UI/Pause Menu".visible == false:
 		if Input.is_action_just_pressed("reset"):

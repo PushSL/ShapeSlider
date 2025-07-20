@@ -30,7 +30,7 @@ var secondary_color: Color
 var glow_color: Color
 var current_level: int = 0
 var levels: int = 2
-var level_path: Array = [\"res://levels/0.tres\", \"res://levels/1.tres\"]
+var level_path: Array = [\"res://levels/0.res\", \"res://levels/1.res\"]
 var data: ConfigFile = ConfigFile.new()
 # Called when the node enters the scene tree for the first time.
 

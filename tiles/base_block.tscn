@@ -1,6 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cktlw5sjtvexc"]
-
-[ext_resource type="Script" uid="uid://df0a3sjgwapd2" path="res://scripts/tile_culler.gd" id="1_klj5d"]
+[gd_scene load_steps=2 format=3 uid="uid://cktlw5sjtvexc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ts0at"]
 size = Vector2(128, 128)
@@ -17,10 +15,3 @@ one_way_collision = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-rect = Rect2(-64, -64, 128, 128)
-script = ExtResource("1_klj5d")
-
-[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_entered"]
-[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_exited"]

@@ -15,6 +15,15 @@ func _ready() -> void:
 	Engine.physics_ticks_per_second = 1
 
 func _process(_delta: float) -> void:
+	var camera_rect = Rect2(
+		$Camera.global_position - get_viewport_rect().size / 2 / $Camera.zoom,
+		get_viewport_rect().size / $Camera.zoom)
+	for object in level.object_data:
+		if object.loaded_object:
+			var object_position = object.loaded_object.global_position
+			var object_size = object.loaded_object.get_rect().size if object.loaded_object.has_method("get_rect") else Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)  # Fallback
+			var object_rect = Rect2(object_position - object_size / 2, object_size)
+			object.loaded_object.visible = camera_rect.intersects(object_rect)
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
 	if block_input == false:
@@ -22,8 +31,10 @@ func _process(_delta: float) -> void:
 			var place: bool = true
 			if level.object_data.size() != 0:
 				var position: Vector2 = ((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6) / 10).round() * 10 
-				if level.object_data.has(position) and level.object_data.get(position)[0] == selected_object:
-					place = false
+				for object in level.object_data:
+					if object.position == position and object.type == selected_object:
+						place = false
+						break
 			else:
 				place = true
 			if place == true:
@@ -43,7 +54,7 @@ func save() -> void:
 	data.level_id = level.level_id
 	data.easy_best = level.easy_best
 	data.hard_best = level.hard_best
-	var error := ResourceSaver.save(data, level_path[current_level])
+	var error := ResourceSaver.save(data, level_path[current_level], ResourceSaver.FLAG_COMPRESS)
 	if error:
 		print("An error happened while saving data: ", error)
 
@@ -58,44 +69,48 @@ func camera():
 	if Input.is_action_just_pressed("zoom_out"):
 		$Camera.zoom /= Vector2(1.25, 1.25)
 
-
 func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> void:
-	level.object_data[round(position / snap) * snap] = [type, layer, null]
-	var object = level.object_data[round(position / snap) * snap]
+	var object = object.new()
+	object.type = type
+	object.position = round(position / snap) * snap
+	object.layer = layer
+	level.object_data.append(object)
 	match type:
 		1:
-			object[2] = preload("res://tiles/block_0.tscn").instantiate()
+			object.loaded_object = preload("res://tiles/block_0.tscn").instantiate()
 		2:
-			object[2] = preload("res://tiles/spike_0.tscn").instantiate()
+			object.loaded_object = preload("res://tiles/spike_0.tscn").instantiate()
 		_:
-			object[2] = preload("res://tiles/base_block.tscn").instantiate()
+			object.loaded_object = preload("res://tiles/base_block.tscn").instantiate()
 	match layer:
 		4:
-			$T4.add_child(object[2])
+			$T4.add_child(object.loaded_object)
 		3:
-			$T3.add_child(object[2])
+			$T3.add_child(object.loaded_object)
 		2:
-			$T2.add_child(object[2])
+			$T2.add_child(object.loaded_object)
 		1:
-			$T1.add_child(object[2])
+			$T1.add_child(object.loaded_object)
 		-1:
-			$B1.add_child(object[2])
+			$B1.add_child(object.loaded_object)
 		-2:
-			$B2.add_child(object[2])
+			$B2.add_child(object.loaded_object)
 		-3:
-			$B3.add_child(object[2])
+			$B3.add_child(object.loaded_object)
 		-4:
-			$B4.add_child(object[2])
+			$B4.add_child(object.loaded_object)
 		_:
-			$T1.add_child(object[2])
-	object[2].position = round(position / snap) * snap * 9.6
+			$T1.add_child(object.loaded_object)
+	object.loaded_object.get_child(0).queue_free()
+	object.loaded_object.position = object.position * 9.6
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	position = (position / snap).round() * snap
-	if level.object_data.has(position):
-		level.object_data.get(position)[2].queue_free()
-		level.object_data.erase(position)
-
+	for object in level.object_data:
+		if object.position == position:
+			object.loaded_object.queue_free()
+			level.object_data.remove_at(level.object_data.find(object))
+			break
 
 
 func clear_level():
@@ -114,34 +129,35 @@ func load_data() -> void:
 	level = level_data.new()
 	level = stored_level
 	for object in level.object_data:
-		var object_info = level.object_data.get(object)
-		match object_info[0]:
+		match object.type:
 			1:
-				object_info[2] = preload("res://tiles/block_0.tscn").instantiate()
+				object.loaded_object = preload("res://tiles/block_0.tscn").instantiate()
 			2:
-				object_info[2] = preload("res://tiles/spike_0.tscn").instantiate()
+				object.loaded_object = preload("res://tiles/spike_0.tscn").instantiate()
 			_:
-				object_info[2] = preload("res://tiles/base_block.tscn").instantiate()
-		match object_info[1]:
+				object.loaded_object = preload("res://tiles/base_block.tscn").instantiate()
+		match object.layer:
 			4:
-				$T4.add_child(object_info[2])
+				$T4.add_child(object.loaded_object)
 			3:
-				$T3.add_child(object_info[2])
+				$T3.add_child(object.loaded_object)
 			2:
-				$T2.add_child(object_info[2])
+				$T2.add_child(object.loaded_object)
 			1:
-				$T1.add_child(object_info[2])
+				$T1.add_child(object.loaded_object)
 			-1:
-				$B1.add_child(object_info[2])
+				$B1.add_child(object.loaded_object)
 			-2:
-				$B2.add_child(object_info[2])
+				$B2.add_child(object.loaded_object)
 			-3:
-				$B3.add_child(object_info[2])
+				$B3.add_child(object.loaded_object)
 			-4:
-				$B4.add_child(object_info[2])
+				$B4.add_child(object.loaded_object)
 			_:
-				$T1.add_child(object_info[2])
-		object_info[2].position = object * 9.6
+				object.layer = 1
+				$T1.add_child(object.loaded_object)
+		object.loaded_object.get_child(0).queue_free()
+		object.loaded_object.position = object.position * 9.6
 
 
 func _on_save_pressed() -> void:
@@ -179,3 +195,10 @@ func _on_exit_pressed() -> void:
 	$/root/ShapeSlider/UI/Menu.scene = "main_menu"
 	$/root/ShapeSlider/UI/Menu.visible = true
 	$/root/ShapeSlider/UI/Menu.modulate.a = 1
+
+func is_in_position(position: Vector2):
+	var target_position = position
+	if position == target_position:
+		return true
+	else:
+		return false
