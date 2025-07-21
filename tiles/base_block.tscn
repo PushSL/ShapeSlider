@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://cktlw5sjtvexc"]
+[gd_scene load_steps=2 format=3 uid="uid://bch8gsfd8srul"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ts0at"]
 size = Vector2(128, 128)
@@ -14,4 +14,3 @@ shape = SubResource("RectangleShape2D_ts0at")
 one_way_collision = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture_filter = 1

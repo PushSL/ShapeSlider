@@ -8,18 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://cd6jhhls5elxf" path="res://textures/moon.png" id="7_m4023"]
 [ext_resource type="Texture2D" uid="uid://0pedoeq6qvik" path="res://levels/themes/Mono Saneness Dark.tres" id="8_0s0e1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vymbj"]
-bg_color = Color(0, 0, 0, 0.658824)
-corner_radius_top_left = 100
-corner_radius_top_right = 100
-corner_radius_bottom_right = 100
-corner_radius_bottom_left = 100
-corner_detail = 20
-anti_aliasing_size = 10.0
-
-[sub_resource type="Theme" id="Theme_jqa43"]
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_vymbj")
-
 [sub_resource type="GDScript" id="GDScript_wakvg"]
 resource_name = "Menu"
 script/source = "extends Control
@@ -32,7 +20,7 @@ var current_level: int = 0
 var levels: int = 2
 var level_path: Array = [\"res://levels/0.res\", \"res://levels/1.res\"]
 var data: ConfigFile = ConfigFile.new()
-# Called when the node enters the scene tree for the first time.
+var object_map: Array = [\"res://tiles/base_block.tscn\", \"res://tiles/block_0.tscn\", \"res://tiles/spike_0.tscn\"]
 
 func _ready() -> void:
 	load_data()
@@ -174,8 +162,8 @@ func _on_start_pressed() -> void:
 		$/root/Level.level = load(level_path[current_level])
 		$/root/Level/Song.stream = load(load(level_path[current_level]).song_path)
 		$/root/Level/Song.play()
-		$/root/Level.load_data()
 		$/root/Level.add_child(preload(\"res://scenes/player.tscn\").instantiate())
+		$/root/Level.load_data()
 		visible = false
 		$/root/Level/Player/Sprite/Primary.modulate = primary_color
 		$/root/Level/Player/Sprite/Secondary.modulate = secondary_color
@@ -655,44 +643,22 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_y81wf"]
 size = Vector2(1920, 190)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vymbj"]
+bg_color = Color(0, 0, 0, 0.658824)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 20
+anti_aliasing_size = 10.0
+
+[sub_resource type="Theme" id="Theme_jqa43"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_vymbj")
+
 [node name="ShapeSlider" type="Node2D"]
 metadata/_edit_lock_ = true
 
 [node name="UI" type="CanvasLayer" parent="."]
-
-[node name="Pause Menu" type="PanelContainer" parent="UI"]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 171.0
-offset_top = 114.0
-offset_right = -171.0
-offset_bottom = -114.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = SubResource("Theme_jqa43")
-
-[node name="Buttons" type="GridContainer" parent="UI/Pause Menu"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="Resume" type="Button" parent="UI/Pause Menu/Buttons"]
-custom_minimum_size = Vector2(200, 100)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_mode = 0
-text = "Resume"
-
-[node name="Exit" type="Button" parent="UI/Pause Menu/Buttons"]
-custom_minimum_size = Vector2(200, 100)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_mode = 0
-text = "Exit"
 
 [node name="Menu" type="Control" parent="UI"]
 visible = false
@@ -2482,6 +2448,40 @@ offset_bottom = 1866.0
 theme = ExtResource("3_chx57")
 metadata/_edit_use_anchors_ = true
 
+[node name="Pause Menu" type="PanelContainer" parent="UI"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 171.0
+offset_top = 114.0
+offset_right = -171.0
+offset_bottom = -114.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_jqa43")
+
+[node name="Buttons" type="GridContainer" parent="UI/Pause Menu"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Resume" type="Button" parent="UI/Pause Menu/Buttons"]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+text = "Resume"
+
+[node name="Exit" type="Button" parent="UI/Pause Menu/Buttons"]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+text = "Exit"
+
 [node name="Debugger" type="Label" parent="UI"]
 offset_left = 4.0
 offset_top = 4.0
@@ -2489,8 +2489,6 @@ offset_right = 44.0
 offset_bottom = 27.0
 theme = ExtResource("3_chx57")
 
-[connection signal="pressed" from="UI/Pause Menu/Buttons/Resume" to="UI/Menu" method="_on_resume_pressed"]
-[connection signal="pressed" from="UI/Pause Menu/Buttons/Exit" to="UI/Menu" method="_on_exit_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Icons" to="UI/Menu" method="_on_icons_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Play" to="UI/Menu" method="_on_play_pressed"]
 [connection signal="pressed" from="UI/Menu/Main Menu/Editor" to="UI/Menu" method="_on_editor_pressed"]
@@ -2499,3 +2497,5 @@ theme = ExtResource("3_chx57")
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Primary" to="UI/Menu" method="_on_primary_color_changed"]
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Secondary" to="UI/Menu" method="_on_secondary_color_changed"]
 [connection signal="color_changed" from="UI/Menu/Color Menu/Color Picker/Glow" to="UI/Menu" method="_on_glow_color_changed"]
+[connection signal="pressed" from="UI/Pause Menu/Buttons/Resume" to="UI/Menu" method="_on_resume_pressed"]
+[connection signal="pressed" from="UI/Pause Menu/Buttons/Exit" to="UI/Menu" method="_on_exit_pressed"]

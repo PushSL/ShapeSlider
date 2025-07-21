@@ -6,3 +6,4 @@ class_name level_data
 @export var level_id: int = 0
 @export var object_data: Array
 @export var song_path: String
+@export var level_length: int

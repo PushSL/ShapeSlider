@@ -17,7 +17,6 @@ collision_mask = 0
 metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
-visible = false
 position = Vector2(0, 48)
 shape = SubResource("RectangleShape2D_0n1tn")
 

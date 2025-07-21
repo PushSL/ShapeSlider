@@ -3,16 +3,7 @@ const JUMP_VELOCITY: int = -1850
 var alive: bool = true
 var gamemode: String = "cube"
 var position_x: float = 0
-
-func _process(delta: float) -> void:
-	var camera_rect = Rect2($Sprite/Camera2D.global_position + $Sprite/Camera2D.offset - get_viewport_rect().size / 2 / $Sprite/Camera2D.zoom, get_viewport_rect().size / $Sprite/Camera2D.zoom)
-	
-	for object in $/root/Level.level.object_data:
-		if object.loaded_object:
-			var object_position = object.loaded_object.global_position
-			var object_size = object.loaded_object.get_rect().size if object.loaded_object.has_method("get_rect") else Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)  # Fallback
-			var object_rect = Rect2(object_position - object_size / 2, object_size)
-			object.loaded_object.visible = camera_rect.intersects(object_rect)
+var camera_rect: Rect2
 
 func _physics_process(delta: float) -> void:
 	if $"/root/ShapeSlider/UI/Pause Menu".visible == false:
@@ -23,11 +14,23 @@ func _physics_process(delta: float) -> void:
 				"cube": cube(delta)
 				"ship": ship(delta)
 				"ufo": ufo(delta)
-			
 			move_and_slide()
 			position_x += 4.275
 			position.x = position_x
-	
+
+func _process(_delta: float) -> void:
+	update_culler()
+
+func update_culler(option: String = "all"):
+	if option == "all" or option == "camera":
+		camera_rect = Rect2($Sprite/Camera2D.global_position + $Sprite/Camera2D.offset - Vector2(96, 96) - get_viewport_rect().size / 2 / $Sprite/Camera2D.zoom, get_viewport_rect().size + Vector2(96, 96) / $Sprite/Camera2D.zoom)
+	if option == "all" or option == "objects":
+		for object in $/root/Level.level.object_data:
+			var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
+			object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+			object.loaded_object.visible = camera_rect.intersects(object.rect)
+			object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+
 func cube(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta

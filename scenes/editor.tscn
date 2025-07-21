@@ -1,12 +1,23 @@
-[gd_scene load_steps=8 format=3 uid="uid://i3q05eclebby"]
+[gd_scene load_steps=11 format=3 uid="uid://i3q05eclebby"]
 
 [ext_resource type="Script" uid="uid://ctuw2r03l060i" path="res://scripts/editor.gd" id="1_b1cmn"]
 [ext_resource type="Theme" uid="uid://bhgecd6ya6p23" path="res://themes/Style_8.tres" id="1_pxqd5"]
 [ext_resource type="Script" uid="uid://bdtfb85crvw0l" path="res://scripts/object_selector.gd" id="3_5lcyj"]
 [ext_resource type="Texture2D" uid="uid://dcoxpapqu7a4e" path="res://textures/ground-1.png" id="3_ba0ut"]
 [ext_resource type="Theme" uid="uid://gupavbcs7mmv" path="res://themes/invisible.tres" id="3_eqbpn"]
-[ext_resource type="PackedScene" uid="uid://ddryw24sdvv0p" path="res://tiles/block_0.tscn" id="4_5lcyj"]
+[ext_resource type="PackedScene" uid="uid://io3hxravo8ey" path="res://tiles/block_0.tscn" id="4_5lcyj"]
 [ext_resource type="PackedScene" uid="uid://cl7bhn748s2tp" path="res://tiles/spike_0.tscn" id="5_5tm2q"]
+[ext_resource type="Script" uid="uid://cc77qrcicnpqc" path="res://scripts/options.gd" id="7_j8y2p"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5lcyj"]
+bg_color = Color(0, 0, 0, 0.521569)
+border_width_top = 4
+border_color = Color(1, 1, 1, 1)
+border_blend = true
+anti_aliasing = false
+
+[sub_resource type="Theme" id="Theme_5tm2q"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_5lcyj")
 
 [node name="Editor" type="Control"]
 layout_mode = 3
@@ -36,39 +47,110 @@ theme = ExtResource("1_pxqd5")
 text = "Menu"
 
 [node name="Bottom" type="PanelContainer" parent="UI"]
+custom_minimum_size = Vector2(0, 300)
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -220.0
+offset_top = -152.0
 grow_horizontal = 2
 grow_vertical = 0
+theme = SubResource("Theme_5tm2q")
+
+[node name="Buttons" type="HBoxContainer" parent="UI/Bottom"]
+custom_minimum_size = Vector2(1900, 275)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme = ExtResource("1_pxqd5")
 
-[node name="GridContainer" type="GridContainer" parent="UI/Bottom"]
+[node name="Modes" type="GridContainer" parent="UI/Bottom/Buttons"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Button" type="Button" parent="UI/Bottom/Buttons/Modes"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button2" type="Button" parent="UI/Bottom/Buttons/Modes"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button3" type="Button" parent="UI/Bottom/Buttons/Modes"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Objects" type="GridContainer" parent="UI/Bottom/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 columns = 2
 script = ExtResource("3_5lcyj")
 
-[node name="Button" type="Button" parent="UI/Bottom/GridContainer"]
+[node name="Button" type="Button" parent="UI/Bottom/Buttons/Objects"]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme = ExtResource("3_eqbpn")
 
-[node name="Block" parent="UI/Bottom/GridContainer/Button" instance=ExtResource("4_5lcyj")]
+[node name="Block" parent="UI/Bottom/Buttons/Objects/Button" instance=ExtResource("4_5lcyj")]
 position = Vector2(48, 48)
 collision_layer = 1
 collision_mask = 1
 
-[node name="Button2" type="Button" parent="UI/Bottom/GridContainer"]
+[node name="Button2" type="Button" parent="UI/Bottom/Buttons/Objects"]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme = ExtResource("3_eqbpn")
 
-[node name="Spike" parent="UI/Bottom/GridContainer/Button2" instance=ExtResource("5_5tm2q")]
+[node name="Spike" parent="UI/Bottom/Buttons/Objects/Button2" instance=ExtResource("5_5tm2q")]
 position = Vector2(48, 48)
 collision_layer = 1
+
+[node name="Options" type="GridContainer" parent="UI/Bottom/Buttons"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
+script = ExtResource("7_j8y2p")
+
+[node name="Swipe" type="Button" parent="UI/Bottom/Buttons/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+toggle_mode = true
+text = "Swipe"
+
+[node name="Rotate" type="Button" parent="UI/Bottom/Buttons/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+toggle_mode = true
+text = "Rotate"
+
+[node name="Free Move" type="Button" parent="UI/Bottom/Buttons/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+toggle_mode = true
+text = "Free
+Move"
+
+[node name="Snap" type="Button" parent="UI/Bottom/Buttons/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+toggle_mode = true
+text = "Snap"
 
 [node name="Menu" type="PanelContainer" parent="UI"]
 visible = false
@@ -187,8 +269,9 @@ z_index = -4
 [connection signal="pressed" from="UI/Menu_Button" to="." method="_on_menu_button_pressed"]
 [connection signal="mouse_entered" from="UI/Bottom" to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="UI/Bottom" to="." method="_on_mouse_exited"]
-[connection signal="pressed" from="UI/Bottom/GridContainer/Button" to="UI/Bottom/GridContainer" method="_on_button_pressed"]
-[connection signal="pressed" from="UI/Bottom/GridContainer/Button2" to="UI/Bottom/GridContainer" method="_on_button_2_pressed"]
+[connection signal="pressed" from="UI/Bottom/Buttons/Objects/Button" to="UI/Bottom/Buttons/Objects" method="_on_button_pressed"]
+[connection signal="pressed" from="UI/Bottom/Buttons/Objects/Button2" to="UI/Bottom/Buttons/Objects" method="_on_button_2_pressed"]
+[connection signal="toggled" from="UI/Bottom/Buttons/Options/Swipe" to="UI/Bottom/Buttons/Options" method="_on_swipe_toggled"]
 [connection signal="pressed" from="UI/Menu/GridContainer/Save" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="UI/Menu/GridContainer/Load" to="." method="_on_load_pressed"]
 [connection signal="pressed" from="UI/Menu/GridContainer/Exit" to="." method="_on_exit_pressed"]

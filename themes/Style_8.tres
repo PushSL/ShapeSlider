@@ -1,27 +1,11 @@
-[gd_resource type="Theme" load_steps=14 format=3 uid="uid://bhgecd6ya6p23"]
+[gd_resource type="Theme" load_steps=13 format=3 uid="uid://bhgecd6ya6p23"]
 
-[ext_resource type="StyleBox" uid="uid://bsssbhqi2vbwf" path="res://themes/Style_Box_8.tres" id="1_wk2qy"]
+[ext_resource type="StyleBox" uid="uid://chgnmc67kc1ed" path="res://themes/Button1.tres" id="2_b2l24"]
 [ext_resource type="Texture2D" uid="uid://ymq6xjravai0" path="res://themes/Square8.png" id="2_gambr"]
 [ext_resource type="StyleBox" uid="uid://csxsqlnb4j2bv" path="res://themes/Style_Box_8_hover.tres" id="3_b2l24"]
 [ext_resource type="StyleBox" uid="uid://fsivcorgrat" path="res://themes/Style_8_panel.tres" id="3_qnqa3"]
 [ext_resource type="StyleBox" uid="uid://gn3qeq4fu2tq" path="res://themes/Style_Box_8_pressed.tres" id="4_qirdv"]
 [ext_resource type="FontFile" uid="uid://c7jv4p3cy0deq" path="res://fonts/PUSAB___.otf" id="5_b2l24"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gp85j"]
-texture = ExtResource("2_gambr")
-texture_margin_left = 34.0
-texture_margin_top = 34.0
-texture_margin_right = 34.0
-texture_margin_bottom = 34.0
-modulate_color = Color(0.886262, 0.886261, 0.886262, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pteg0"]
-texture = ExtResource("2_gambr")
-texture_margin_left = 34.0
-texture_margin_top = 34.0
-texture_margin_right = 34.0
-texture_margin_bottom = 34.0
-modulate_color = Color(0.65834, 0.65834, 0.65834, 1)
 
 [sub_resource type="Image" id="Image_b2l24"]
 data = {
@@ -68,6 +52,13 @@ expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qnqa3"]
+texture = ExtResource("2_gambr")
+texture_margin_left = 34.0
+texture_margin_top = 34.0
+texture_margin_right = 34.0
+texture_margin_bottom = 34.0
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b2l24"]
 bg_color = Color(0, 0.784314, 0, 1)
 corner_radius_top_left = 3
@@ -79,11 +70,11 @@ corner_radius_bottom_left = 3
 default_font = ExtResource("5_b2l24")
 Button/constants/outline_size = 8
 Button/fonts/font = ExtResource("5_b2l24")
-Button/styles/disabled = ExtResource("1_wk2qy")
-Button/styles/focus = ExtResource("1_wk2qy")
-Button/styles/hover = SubResource("StyleBoxTexture_gp85j")
-Button/styles/normal = ExtResource("1_wk2qy")
-Button/styles/pressed = SubResource("StyleBoxTexture_pteg0")
+Button/styles/disabled = ExtResource("2_b2l24")
+Button/styles/focus = ExtResource("2_b2l24")
+Button/styles/hover = ExtResource("2_b2l24")
+Button/styles/normal = ExtResource("2_b2l24")
+Button/styles/pressed = ExtResource("2_b2l24")
 ColorPickerButton/colors/font_color = Color(1, 1, 1, 1)
 ColorPickerButton/colors/font_disabled_color = Color(0.9, 0.9, 0.9, 0.3)
 ColorPickerButton/colors/font_focus_color = Color(1, 1, 1, 1)
@@ -97,7 +88,7 @@ ColorPickerButton/icons/bg = SubResource("ImageTexture_qirdv")
 ColorPickerButton/styles/disabled = SubResource("StyleBoxFlat_rtppx")
 ColorPickerButton/styles/focus = SubResource("StyleBoxFlat_007w8")
 ColorPickerButton/styles/hover = ExtResource("3_b2l24")
-ColorPickerButton/styles/normal = ExtResource("1_wk2qy")
+ColorPickerButton/styles/normal = SubResource("StyleBoxTexture_qnqa3")
 ColorPickerButton/styles/pressed = ExtResource("4_qirdv")
 Label/constants/outline_size = 8
 Label/fonts/font = ExtResource("5_b2l24")

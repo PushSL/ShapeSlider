@@ -3,10 +3,14 @@ extends Control
 @onready var current_level: int = $/root/ShapeSlider/UI/Menu.current_level
 @onready var level: level_data = load(level_path[current_level])
 @onready var stored_level: level_data = level
+@onready var object_map: Array = $/root/ShapeSlider/UI/Menu.object_map
+var camera_rect: Rect2
+var last_place: Vector2
 var drag_start_camera_position: Vector2
 var drag_start_cursor_position: Vector2
 var selected_object: int = 1
 var block_input: bool = false
+var swipe: bool = false
 
 func _ready() -> void:
 	load_data()
@@ -14,20 +18,12 @@ func _ready() -> void:
 	modulate.a = 0
 	Engine.physics_ticks_per_second = 1
 
+
 func _process(_delta: float) -> void:
-	var camera_rect = Rect2(
-		$Camera.global_position - get_viewport_rect().size / 2 / $Camera.zoom,
-		get_viewport_rect().size / $Camera.zoom)
-	for object in level.object_data:
-		if object.loaded_object:
-			var object_position = object.loaded_object.global_position
-			var object_size = object.loaded_object.get_rect().size if object.loaded_object.has_method("get_rect") else Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)  # Fallback
-			var object_rect = Rect2(object_position - object_size / 2, object_size)
-			object.loaded_object.visible = camera_rect.intersects(object_rect)
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
 	if block_input == false:
-		if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and Input.is_action_pressed("swipe"):
+		if Input.is_action_just_released("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) < 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) < 6) or Input.is_action_pressed("left_click") and (Input.is_action_pressed("swipe") or swipe):
 			var place: bool = true
 			if level.object_data.size() != 0:
 				var position: Vector2 = ((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6) / 10).round() * 10 
@@ -39,12 +35,12 @@ func _process(_delta: float) -> void:
 				place = true
 			if place == true:
 				place_tile(selected_object, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
-		if Input.is_action_pressed("right_click") and Input.is_action_pressed("swipe") or Input.is_action_just_released("right_click"):
+		if Input.is_action_pressed("right_click") and (Input.is_action_pressed("swipe") or swipe) or Input.is_action_just_released("right_click"):
 			delete_tile((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6))
-		if not Input.is_action_pressed("swipe"):
-			camera()
-		else:
-			drag_start_cursor_position = get_viewport().get_mouse_position()
+	if Input.is_action_just_released("swipe"):
+		drag_start_cursor_position = get_viewport().get_mouse_position()
+		drag_start_camera_position = $Camera.position
+	camera()
 
 func save() -> void:
 	var data := level_data.new()
@@ -54,20 +50,29 @@ func save() -> void:
 	data.level_id = level.level_id
 	data.easy_best = level.easy_best
 	data.hard_best = level.hard_best
+	for object in level.object_data:
+		if object.position.x > data.level_length:
+			data.level_length = object.position.x
 	var error := ResourceSaver.save(data, level_path[current_level], ResourceSaver.FLAG_COMPRESS)
 	if error:
 		print("An error happened while saving data: ", error)
 
 func camera():
-	if Input.is_action_just_pressed("left_click"):
-		drag_start_cursor_position = get_viewport().get_mouse_position()
-		drag_start_camera_position = $Camera.position
-	if Input.is_action_pressed("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) > 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) > 6):
-		$Camera.position = drag_start_camera_position + (drag_start_cursor_position - get_viewport().get_mouse_position()) / $Camera.zoom.x
+	if not Input.is_action_pressed("swipe") and !swipe:
+		if Input.is_action_just_pressed("left_click"):
+			drag_start_cursor_position = get_viewport().get_mouse_position()
+			drag_start_camera_position = $Camera.position
+		if Input.is_action_pressed("left_click") and (abs(drag_start_cursor_position.x - get_viewport().get_mouse_position().x) > 6 or abs(drag_start_cursor_position.y - get_viewport().get_mouse_position().y) > 6):
+			$Camera.position = drag_start_camera_position + (drag_start_cursor_position - get_viewport().get_mouse_position()) / $Camera.zoom.x
+			update_culler()
+		else:
+			drag_start_cursor_position = get_viewport().get_mouse_position()
 	if Input.is_action_just_pressed("zoom_in"):
 		$Camera.zoom *= Vector2(1.25, 1.25)
+		update_culler()
 	if Input.is_action_just_pressed("zoom_out"):
 		$Camera.zoom /= Vector2(1.25, 1.25)
+		update_culler()
 
 func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> void:
 	var object = object.new()
@@ -75,13 +80,7 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 	object.position = round(position / snap) * snap
 	object.layer = layer
 	level.object_data.append(object)
-	match type:
-		1:
-			object.loaded_object = preload("res://tiles/block_0.tscn").instantiate()
-		2:
-			object.loaded_object = preload("res://tiles/spike_0.tscn").instantiate()
-		_:
-			object.loaded_object = preload("res://tiles/base_block.tscn").instantiate()
+	object.loaded_object = load(object_map[type]).instantiate()
 	match layer:
 		4:
 			$T4.add_child(object.loaded_object)
@@ -106,12 +105,13 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	position = (position / snap).round() * snap
+	var index: int
 	for object in level.object_data:
 		if object.position == position:
 			object.loaded_object.queue_free()
-			level.object_data.remove_at(level.object_data.find(object))
+			level.object_data.remove_at(index)
 			break
-
+		index += 1
 
 func clear_level():
 	var threads: Array
@@ -129,13 +129,7 @@ func load_data() -> void:
 	level = level_data.new()
 	level = stored_level
 	for object in level.object_data:
-		match object.type:
-			1:
-				object.loaded_object = preload("res://tiles/block_0.tscn").instantiate()
-			2:
-				object.loaded_object = preload("res://tiles/spike_0.tscn").instantiate()
-			_:
-				object.loaded_object = preload("res://tiles/base_block.tscn").instantiate()
+		object.loaded_object = load(object_map[object.type]).instantiate()
 		match object.layer:
 			4:
 				$T4.add_child(object.loaded_object)
@@ -156,8 +150,9 @@ func load_data() -> void:
 			_:
 				object.layer = 1
 				$T1.add_child(object.loaded_object)
-		object.loaded_object.get_child(0).queue_free()
 		object.loaded_object.position = object.position * 9.6
+		object.loaded_object.get_child(0).queue_free()
+	update_culler()
 
 
 func _on_save_pressed() -> void:
@@ -172,6 +167,14 @@ func _on_load_pressed() -> void:
 func _on_mouse_entered() -> void:
 	block_input = true
 
+func update_culler(option: String = "all"):
+	if option == "all" or option == "camera":
+		camera_rect = Rect2($Camera.global_position - get_viewport_rect().size / 2 / $Camera.zoom, get_viewport_rect().size / $Camera.zoom)
+	if option == "all" or option == "objects":
+		for object in level.object_data:
+			var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)  # Fallback
+			object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+			object.loaded_object.visible = camera_rect.intersects(object.rect)
 
 func _on_mouse_exited() -> void:
 	if not $UI/Menu.visible:

@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://v6mcmi5ptnkd"]
+
+[ext_resource type="StyleBox" uid="uid://cvh08x3d75xue" path="res://themes/Button2.tres" id="1_aogf1"]
+
+[resource]
+Button/styles/disabled = ExtResource("1_aogf1")
+Button/styles/focus = ExtResource("1_aogf1")
+Button/styles/hover = ExtResource("1_aogf1")
+Button/styles/normal = ExtResource("1_aogf1")
+Button/styles/pressed = ExtResource("1_aogf1")

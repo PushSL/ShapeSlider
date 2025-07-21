@@ -4,3 +4,4 @@ class_name object
 @export var type: int = 0
 @export var layer: int = 1
 var loaded_object: Node = null
+var rect: Rect2
