@@ -22,7 +22,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_released("swipe"):
-		_on_shift_released()
+		_deferred()
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
 	if block_input == false:
@@ -30,14 +30,18 @@ func _process(_delta: float) -> void:
 			var place: bool = true
 			if level.object_data.size() != 0:
 				var position: Vector2 = ((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6) / 10).round() * 10 
+				var now: int = Time.get_ticks_msec()
+				#place = !find_object(position, selected_object)
 				for object in level.object_data:
 					if object.position == position and object.type == selected_object:
 						place = false
 						break
+				print(Time.get_ticks_msec() - now)
 			else:
 				place = true
 			if place == true:
 				place_tile(selected_object, (get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6), 1)
+
 		if Input.is_action_pressed("right_click") and (Input.is_action_pressed("swipe") or swipe) or Input.is_action_just_released("right_click"):
 			delete_tile((get_global_mouse_position() - Vector2(DisplayServer.window_get_size()) / Vector2(2, 2)) / Vector2(9.6, 9.6))
 	if Input.is_action_just_released("swipe"):
@@ -82,7 +86,10 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 	object.type = type
 	object.position = round(position / snap) * snap
 	object.layer = layer
-	level.object_data.append(object)
+	var i: int = level.object_data.size() - 1
+	while i >= 0 and level.object_data[i].position > object.position:
+		i -= 1
+	level.object_data.insert(i + 1, object)
 	object.loaded_object = load(object_map[type]).instantiate()
 	match layer:
 		4:
@@ -103,8 +110,10 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 			$B4.add_child(object.loaded_object)
 		_:
 			$T1.add_child(object.loaded_object)
-	deletion_queue.append(object.loaded_object.get_child(0))
 	object.loaded_object.position = object.position * 9.6
+	deletion_queue.append(object.loaded_object.get_child(0))
+	if not Input.is_action_just_pressed("swipe"):
+		_deferred()
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	position = (position / snap).round() * snap
@@ -211,7 +220,26 @@ func is_in_position(position: Vector2):
 	else:
 		return false
 
-func _on_shift_released():
+func _deferred():
 	for object in deletion_queue:
 		object.call_deferred("queue_free")
 	deletion_queue.clear()
+
+func lexicographically_sort(a, b):
+	if a.position.x == b.position.x:
+		return a.position.y < b.position.y
+	return a.position.x < b.position.x
+
+func find_object(position: Vector2, type: int) -> bool:
+	var left: int = 0
+	var right: int = level.object_data.size() - 1
+	while left <= right:
+		var mid = (left + right) / 2
+		var object = level.object_data[mid]
+		if object.position == position:
+			return object.type == type
+		elif object.position < position:
+			left = mid + 1
+		else:
+			right = mid - 1
+	return false
