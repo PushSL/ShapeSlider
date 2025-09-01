@@ -4,6 +4,7 @@ extends Control
 @onready var level: level_data = load(level_path[current_level])
 @onready var stored_level: level_data = level
 @onready var object_map: Array = $/root/ShapeSlider/UI/Menu.object_map
+var deletion_queue: Array
 var camera_rect: Rect2
 var last_place: Vector2
 var drag_start_camera_position: Vector2
@@ -20,6 +21,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if Input.is_action_just_released("swipe"):
+		_on_shift_released()
 	if Input.is_action_just_pressed("exit"):
 		_on_menu_button_pressed()
 	if block_input == false:
@@ -100,7 +103,7 @@ func place_tile(type: int, position: Vector2, layer: int, snap: int = 10) -> voi
 			$B4.add_child(object.loaded_object)
 		_:
 			$T1.add_child(object.loaded_object)
-	object.loaded_object.get_child(0).queue_free()
+	deletion_queue.append(object.loaded_object.get_child(0))
 	object.loaded_object.position = object.position * 9.6
 
 func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
@@ -108,10 +111,12 @@ func delete_tile(position: Vector2 = Vector2.ZERO, snap: int = 10) -> void:
 	var index: int
 	for object in level.object_data:
 		if object.position == position:
-			object.loaded_object.queue_free()
+			deletion_queue.append(object.loaded_object)
+			object.loaded_object.visible = false
 			level.object_data.remove_at(index)
 			break
 		index += 1
+
 
 func clear_level():
 	var threads: Array
@@ -205,3 +210,8 @@ func is_in_position(position: Vector2):
 		return true
 	else:
 		return false
+
+func _on_shift_released():
+	for object in deletion_queue:
+		object.call_deferred("queue_free")
+	deletion_queue.clear()
