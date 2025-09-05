@@ -124,7 +124,6 @@ func kill(time = 0.5, start_delay = 0.1):
 			await get_tree().create_timer(time).timeout
 		position = Vector2.ZERO
 		datalock = false
-		await $/root/Level.clear_level().finished()
 		$/root/Level.load_data()
 		$Sprite.rotation_degrees = 0
 		position_x = 0
