@@ -36,7 +36,6 @@ func _process(_delta: float) -> void:
 					if object.position == position and object.type == selected_object:
 						place = false
 						break
-				print(Time.get_ticks_msec() - now)
 			else:
 				place = true
 			if place == true:
@@ -50,6 +49,7 @@ func _process(_delta: float) -> void:
 	camera()
 
 func save() -> void:
+	level.object_data.sort_custom(lexicographically_sort)
 	var data := level_data.new()
 	data.object_data = level.object_data
 	data.song_path = level.song_path

@@ -158,7 +158,7 @@ func _on_start_pressed() -> void:
 		$\"Level Selector/AudioStreamPlayer\".stream = preload(\"res://sounds/start_level.ogg\")
 		$\"Level Selector/AudioStreamPlayer\".play()
 		await $\"Level Selector/AudioStreamPlayer\".finished
-		$/root.add_child(preload(\"res://scenes/base_level.tscn\").instantiate())
+		$/root.add_child(load(\"res://scenes/base_level.tscn\").instantiate())
 		$/root/Level.level = load(level_path[current_level])
 		$/root/Level/Song.stream = load(load(level_path[current_level]).song_path)
 		$/root/Level/Song.play()

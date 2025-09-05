@@ -4,7 +4,7 @@ var alive: bool = true
 var gamemode: String = "cube"
 var position_x: float = 0
 var camera_rect: Rect2
-
+var datalock: bool = false
 func _physics_process(delta: float) -> void:
 	if $"/root/ShapeSlider/UI/Pause Menu".visible == false:
 		if Input.is_action_just_pressed("reset"):
@@ -18,18 +18,45 @@ func _physics_process(delta: float) -> void:
 			position_x += 4.275
 			position.x = position_x
 
-func _process(_delta: float) -> void:
-	update_culler()
-
-func update_culler(option: String = "all"):
+func update_culler(option: String = "all", safe_mode: bool = true, range: Array = []):
 	if option == "all" or option == "camera":
 		camera_rect = Rect2($Sprite/Camera2D.global_position + $Sprite/Camera2D.offset - Vector2(96, 96) - get_viewport_rect().size / 2 / $Sprite/Camera2D.zoom, get_viewport_rect().size + Vector2(96, 96) / $Sprite/Camera2D.zoom)
-	if option == "all" or option == "objects":
-		for object in $/root/Level.level.object_data:
-			var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
-			object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
-			object.loaded_object.visible = camera_rect.intersects(object.rect)
-			object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+	if safe_mode and option == "all" or option == "objects":
+		if range.is_empty():
+			for object in $/root/Level.level.object_data:
+				if object.loaded_object:
+					var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
+					object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+					object.loaded_object.visible = camera_rect.intersects(object.rect)
+					object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+		else:
+			for index in range:
+				var object = $/root/Level.level.object_data[index]
+				if object.loaded_object:
+					var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
+					object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+					object.loaded_object.visible = camera_rect.intersects(object.rect)
+					object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+	elif option == "all" or option == "objects":
+		if range.is_empty():
+			for object in $/root/Level.level.object_data:
+				var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
+				object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+				object.loaded_object.visible = camera_rect.intersects(object.rect)
+				object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+		else:
+			for index in range:
+				var object = $/root/Level.level.object_data[index]
+				var object_size = Vector2(128 * object.loaded_object.scale.x, 128 * object.loaded_object.scale.y)
+				object.rect = Rect2(object.loaded_object.global_position - object_size / 2, object_size)
+				object.loaded_object.visible = camera_rect.intersects(object.rect)
+				object.loaded_object.get_child(0).disabled = not object.loaded_object.visible
+
+func uncull():
+	for object in $/root/Level.level.object_data:
+		if object.loaded_object:
+			object.loaded_object.visible = true
+			object.loaded_object.get_child(0).disabled = false
 
 func cube(delta: float) -> void:
 	if not is_on_floor():
@@ -89,26 +116,29 @@ func ufo(_delta: float) -> void:
 func kill(time = 0.5, start_delay = 0.1):
 	if alive:
 		alive = false
+		datalock = true
 		$CollisionShape2D.disabled = true
 		$/root/Level/Song.playing = false
 		if time != 0:
 			$Explode.play()
 			await get_tree().create_timer(time).timeout
-		$/root/Level.clear_level()
+		position = Vector2.ZERO
+		datalock = false
+		await $/root/Level.clear_level().finished()
 		$/root/Level.load_data()
 		$Sprite.rotation_degrees = 0
 		position_x = 0
-		position = Vector2(0, 0)
 		velocity = Vector2.ZERO
 		$Sprite/Camera2D.position_smoothing_enabled = false
 		$Sprite/Camera2D.drag_vertical_enabled = false
-		await get_tree().create_timer(0).timeout
+		await get_tree().process_frame
 		$Sprite/Camera2D.position_smoothing_enabled = true
 		$Sprite/Camera2D.drag_vertical_enabled = true
 		await get_tree().create_timer(start_delay).timeout
+		alive = true
 		$CollisionShape2D.disabled = false
 		$/root/Level/Song.playing = true
-		alive = true
+
 
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
